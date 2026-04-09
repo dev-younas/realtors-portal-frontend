@@ -1,0 +1,21 @@
+/* Keep CSS minimal: Tailwind handles most styling in the template. */
+
+.sidebar {
+  width: 288px;
+  transition: width 0.25s ease;
+}
+
+.sidebar.collapsed {
+  width: 84px;
+}
+
+/* Active states kept in CSS (routerLinkActive adds .active) */
+.menu-link.active {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.25);
+}
+
+.submenu-link.active {
+  background: rgba(16, 185, 129, 0.1);
+  color: rgba(167, 243, 208, 1);
+}

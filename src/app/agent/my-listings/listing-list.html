@@ -1,0 +1,206 @@
+<div class="page-wrapper space-y-6">
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div>
+      <div class="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">Agent</div>
+      <h1 class="mt-3 text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">My Listings</h1>
+      <p class="mt-1 text-sm text-slate-600">Manage all your property listings</p>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <div class="relative">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search listings…" [(ngModel)]="searchTerm" (input)="onSearch()" class="rounded-xl border border-slate-200 pl-9 pr-4 py-2 text-sm w-48 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500" />
+      </div>
+      <select [(ngModel)]="statusFilter" (change)="onSearch()" class="rounded-xl border border-slate-200 px-4 py-2 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
+        <option value="">All Status</option>
+        <option value="Approved">Approved</option>
+        <option value="Pending">Pending</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+      <a routerLink="/agent/my-listings/create" class="inline-flex items-center gap-2 rounded-xl border border-transparent bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Post New Ad
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-emerald-700">🏠</div>
+      <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ listings.length }}</div>
+      <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Total Listings</div>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="grid h-10 w-10 place-items-center rounded-xl bg-sky-50 text-sky-700">✅</div>
+      <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ approvedCount }}</div>
+      <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Approved</div>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-amber-700">⏳</div>
+      <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ pendingCount }}</div>
+      <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Pending</div>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="grid h-10 w-10 place-items-center rounded-xl bg-rose-50 text-rose-700">❌</div>
+      <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ rejectedCount }}</div>
+      <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Rejected</div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+      <span class="text-base font-bold text-slate-900">All My Listings</span>
+      <span class="text-sm text-slate-500">{{ filtered.length }} results</span>
+    </div>
+
+    <div class="loading-overlay" *ngIf="loading"><div class="spinner"></div> Loading…</div>
+
+    <div class="overflow-x-auto" *ngIf="!loading">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-slate-100 bg-slate-50/80">
+            <th class="text-left font-semibold text-slate-600 px-5 py-3">Title</th>
+            <th class="text-left font-semibold text-slate-600 px-5 py-3">Category</th>
+            <th class="text-left font-semibold text-slate-600 px-5 py-3">Price</th>
+            <th class="text-left font-semibold text-slate-600 px-5 py-3">Images</th>
+            <th class="text-left font-semibold text-slate-600 px-5 py-3">Status</th>
+            <th class="text-left font-semibold text-slate-600 px-5 py-3">Date</th>
+            <th class="text-left font-semibold text-slate-600 px-5 py-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let l of paginated" class="border-b border-slate-100 hover:bg-slate-50/50">
+            <td class="px-5 py-3 font-medium text-slate-900 max-w-[200px]">{{ l.title }}</td>
+            <td class="px-5 py-3"><span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">{{ l.categoryName || l.category?.name || l.category || '—' }}</span></td>
+            <td class="px-5 py-3 font-semibold text-slate-900">${{ l.price | number }}</td>
+            <td class="px-5 py-3 text-slate-600">{{ l.imageCount || 0 }} photos</td>
+            <td class="px-5 py-3">
+              <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold" [ngClass]="{'bg-emerald-50 text-emerald-700': l.status === 'Approved', 'bg-amber-50 text-amber-700': l.status === 'Pending', 'bg-rose-50 text-rose-700': l.status === 'Rejected'}">{{ l.status }}</span>
+            </td>
+            <td class="px-5 py-3 text-slate-600">{{ l.createdDate | date:'MMM d, y' }}</td>
+            <td class="px-5 py-3">
+              <div class="flex gap-2 flex-wrap">
+                <button type="button" class="text-emerald-600 font-medium hover:text-emerald-700 text-sm" (click)="viewDetail(l); $event.stopPropagation()">View</button>
+                <button type="button" class="text-sky-600 font-medium hover:text-sky-700 text-sm" *ngIf="l.status !== 'Rejected'" (click)="uploadImages(l); $event.stopPropagation()">📷 Photos</button>
+                <button type="button" class="text-rose-600 font-medium hover:text-rose-700 text-sm" (click)="confirmDelete(l); $event.stopPropagation()">Delete</button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filtered.length === 0">
+            <td colspan="7" class="px-5 py-12 text-center">
+              <div class="text-slate-500">
+                <div class="text-3xl mb-2">🏠</div>
+                <h3 class="font-semibold text-slate-700">No listings found</h3>
+                <p class="text-sm mt-1">Post your first ad or try adjusting the filters.</p>
+                <a routerLink="/agent/my-listings/create" class="inline-flex mt-4 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">Post First Ad</a>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex items-center justify-between border-t border-slate-100 px-5 py-3 text-sm text-slate-600" *ngIf="!loading && filtered.length > 0">
+      <span>Showing {{ pageStart }}–{{ pageEnd }} of {{ filtered.length }}</span>
+      <div class="flex gap-1">
+        <button type="button" class="rounded-lg border border-slate-200 px-3 py-1.5 font-medium hover:bg-slate-50 disabled:opacity-50" [disabled]="page===1" (click)="setPage(page-1)">‹</button>
+        <button type="button" class="rounded-lg border px-3 py-1.5 font-medium" *ngFor="let p of pages" [class.border-emerald-500]="p===page" [class.bg-emerald-50]="p===page" [class.text-emerald-700]="p===page" (click)="setPage(p)">{{ p }}</button>
+        <button type="button" class="rounded-lg border border-slate-200 px-3 py-1.5 font-medium hover:bg-slate-50 disabled:opacity-50" [disabled]="page===totalPages" (click)="setPage(page+1)">›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Inline View Detail Panel -->
+<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm mt-6" *ngIf="showModal && selectedListing">
+  <div class="flex items-start justify-between mb-4 border-b border-slate-100 pb-4">
+    <div class="flex items-start gap-3">
+      <div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-emerald-600 text-xl shrink-0">🏠</div>
+      <div>
+        <h2 class="text-lg md:text-xl font-semibold text-slate-900 leading-tight">{{ selectedListing.title }}</h2>
+        <p class="text-xs md:text-sm text-slate-500 mt-1">Posted {{ selectedListing.createdDate | date:'MMM d, y' }}</p>
+      </div>
+    </div>
+    <button type="button" class="text-slate-400 hover:text-slate-600" (click)="closeModal()" aria-label="Close details panel">
+      <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+    <div class="flex items-center justify-between py-2 border-b border-slate-100">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Price</span>
+      <span class="text-base md:text-lg font-bold text-emerald-700">${{ selectedListing.price | number }}</span>
+    </div>
+    <div class="flex items-center justify-between py-2 border-b border-slate-100">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Category</span>
+      <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">{{ selectedListing.categoryName || selectedListing.category?.name || selectedListing.category || '—' }}</span>
+    </div>
+    <div class="flex items-center justify-between py-2 border-b border-slate-100">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</span>
+      <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold" [ngClass]="{'bg-emerald-50 text-emerald-700': selectedListing.status === 'Approved', 'bg-amber-50 text-amber-700': selectedListing.status === 'Pending', 'bg-rose-50 text-rose-700': selectedListing.status === 'Rejected'}">{{ selectedListing.status }}</span>
+    </div>
+    <div class="flex items-center justify-between py-2 border-b border-slate-100">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Expires</span>
+      <span class="text-sm text-slate-700">{{ selectedListing.expiryDate | date:'MMM d, y' }}</span>
+    </div>
+  </div>
+  <div *ngIf="selectedListing.description" class="mt-4">
+    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Description</div>
+    <p class="text-sm text-slate-700 leading-relaxed rounded-xl bg-emerald-50 border border-emerald-100 p-3">{{ selectedListing.description }}</p>
+  </div>
+  <div class="pt-4 mt-4 border-t border-slate-100 flex justify-end">
+    <button type="button" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" (click)="closeModal()">Close</button>
+  </div>
+</div>
+
+<!-- Inline Upload Images Panel -->
+<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm mt-6" *ngIf="showUploadModal && selectedListing">
+  <div class="flex items-start justify-between mb-4 border-b border-slate-100 pb-4">
+    <div class="flex items-start gap-3">
+      <div class="grid h-10 w-10 place-items-center rounded-xl bg-sky-50 text-sky-600 text-xl shrink-0">📷</div>
+      <div>
+        <h2 class="text-lg font-semibold text-slate-900 leading-tight">Upload Photos</h2>
+        <p class="text-xs md:text-sm text-slate-500 mt-1">{{ selectedListing.title }}</p>
+      </div>
+    </div>
+    <button type="button" class="text-slate-400 hover:text-slate-600" (click)="closeUploadModal()" aria-label="Close upload images panel">
+      <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="space-y-3">
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-1">Select Images</label>
+      <input type="file" class="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm" multiple accept="image/*" (change)="onFilesSelected($event)" />
+      <small class="block mt-1 text-xs text-slate-500">Max {{ maxImagesPerAd }} images. JPG, PNG, WEBP.</small>
+    </div>
+    <div *ngIf="selectedFiles.length > 0" class="flex flex-wrap gap-2">
+      <span *ngFor="let f of selectedFiles" class="inline-flex items-center px-2.5 py-1 rounded-full border border-emerald-100 bg-emerald-50 text-xs text-slate-700">{{ f.name }}</span>
+    </div>
+  </div>
+  <div class="pt-4 mt-4 border-t border-slate-100 flex justify-end gap-3">
+    <button type="button" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" (click)="closeUploadModal()" [disabled]="uploading">Cancel</button>
+    <button type="button" class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60" (click)="submitImages()" [disabled]="uploading || selectedFiles.length === 0">
+      <div class="spinner" *ngIf="uploading" style="width:14px;height:14px;border-width:2px;border-color:rgba(255,255,255,0.3);border-top-color:#fff"></div>
+      <span *ngIf="!uploading">Upload Photos</span><span *ngIf="uploading">Uploading…</span>
+    </button>
+  </div>
+</div>
+
+<!-- Inline Delete Confirm Panel -->
+<div class="rounded-2xl border border-rose-200 bg-rose-50 p-6 mt-6" *ngIf="showDeleteModal && selectedListing">
+  <div class="flex items-start gap-3">
+    <div class="grid h-10 w-10 place-items-center rounded-xl bg-rose-100 text-2xl shrink-0">🗑️</div>
+    <div class="flex-1">
+      <h2 class="text-base md:text-lg font-semibold text-rose-900 mb-1">Delete listing?</h2>
+      <p class="text-sm text-rose-800 leading-relaxed">Are you sure you want to delete <span class="font-semibold">{{ selectedListing.title }}</span>? This action cannot be undone.</p>
+      <div class="mt-4 flex flex-wrap gap-3 justify-end">
+        <button type="button" class="rounded-xl border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-900 hover:bg-rose-50" (click)="closeDeleteModal()">Cancel</button>
+        <button type="button" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700" (click)="deleteListing()">Yes, delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container">
+  <div class="toast" [ngClass]="t.type" *ngFor="let t of toasts">{{ t.type === 'success' ? '✅' : '❌' }} {{ t.message }}</div>
+</div>

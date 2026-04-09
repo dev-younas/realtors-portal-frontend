@@ -1,0 +1,320 @@
+<div class="page-wrapper space-y-6">
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div>
+      <div class="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">
+        Billing
+      </div>
+      <h1 class="mt-3 text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">Subscription Packages</h1>
+      <p class="mt-1 text-sm text-slate-600">Manage all subscription plans available to realtors</p>
+    </div>
+    <div class="toolbar flex items-center gap-3 flex-wrap">
+      <div class="search-box flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
+        <svg class="text-slate-400" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg>
+        <input
+          class="bg-transparent outline-none text-sm placeholder:text-slate-400"
+          type="text"
+          placeholder="Search packages…"
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()"
+        />
+      </div>
+      <button
+        class="btn btn-primary inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
+        (click)="openCreateModal()"
+      >
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        New Package
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-emerald-700">📦</div>
+      <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ packages.length }}</div>
+      <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Total Packages</div>
+      <div class="mt-2 inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700">
+        All plans
+      </div>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="grid h-10 w-10 place-items-center rounded-xl bg-violet-50 text-violet-700">💎</div>
+      <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ premiumCount }}</div>
+      <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Premium Plans</div>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="flex items-start justify-between">
+        <div class="grid h-10 w-10 place-items-center rounded-xl bg-sky-50 text-sky-700">👥</div>
+        <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700">↑ 12%</span>
+      </div>
+      <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ totalSubscribers }}</div>
+      <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Active Subscribers</div>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="flex items-start justify-between">
+        <div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-emerald-700">💰</div>
+        <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700">↑ 8.5%</span>
+      </div>
+      <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">${{ monthlyRevenue | number }}</div>
+      <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Monthly Revenue</div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="card rounded-2xl border border-slate-200 bg-white shadow-sm" *ngIf="loading">
+    <div class="loading-overlay">
+      <div class="spinner"></div> Loading packages…
+    </div>
+  </div>
+
+  <!-- Packages Grid -->
+  <div class="packages-grid mt-2" *ngIf="!loading">
+    <div class="package-card" *ngFor="let pkg of filteredPackages" [class.featured]="pkg.isFeatured">
+
+      <div class="pkg-header">
+        <div class="pkg-badge" *ngIf="pkg.isFeatured">⭐ Featured</div>
+        <h3>{{ pkg.name }}</h3>
+        <div class="pkg-price">
+          <span class="price">${{ pkg.price }}</span>
+          <span class="period">/{{ pkg.durationDays }}d</span>
+        </div>
+      </div>
+
+      <div class="pkg-body">
+        <p class="pkg-desc">{{ pkg.description }}</p>
+        <ul class="pkg-features">
+          <li>
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+              <path d="m5 13 4 4L19 7" />
+            </svg>
+            {{ pkg.maxAds === 999 ? 'Unlimited' : pkg.maxAds }} Ads
+          </li>
+          <li>
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+              <path d="m5 13 4 4L19 7" />
+            </svg>
+            {{ pkg.maxImages === 999 ? 'Unlimited' : pkg.maxImages }} Total Images
+          </li>
+          <li>
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+              <path d="m5 13 4 4L19 7" />
+            </svg>
+            {{ pkg.maxImagesPerAd }} Images per Ad
+          </li>
+          <li>
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+              <path d="m5 13 4 4L19 7" />
+            </svg>
+            {{ pkg.durationDays }} Days Duration
+          </li>
+        </ul>
+        <div class="pkg-stats">
+          <span>{{ pkg.subscriberCount || 0 }} subscribers</span>
+          <span class="badge" [ngClass]="pkg.isActive ? 'badge-active' : 'badge-inactive'">
+            {{ pkg.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="pkg-footer">
+        <button class="btn btn-outline btn-sm" (click)="editPackage(pkg)">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+          </svg>
+          Edit
+        </button>
+        <button class="btn btn-ghost btn-sm" (click)="toggleStatus(pkg)">
+          {{ pkg.isActive ? 'Deactivate' : 'Activate' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty -->
+    <div class="card" *ngIf="filteredPackages.length === 0">
+      <div class="empty-state">
+        <div class="empty-icon">📦</div>
+        <h3>No packages found</h3>
+        <p>Try adjusting your search or create a new package.</p>
+        <button class="btn btn-primary" style="margin-top:16px" (click)="openCreateModal()">
+          Create First Package
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     Inline Add / Edit Package Form
+     ============================================================ -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6" *ngIf="showModal">
+  <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 text-blue-600 text-lg">
+        {{ editingPackage ? '✏️' : '📦' }}
+      </div>
+      <div>
+        <h2 class="text-xl font-semibold text-gray-800">{{ editingPackage ? 'Edit Package' : 'Create New Package' }}
+        </h2>
+        <p class="text-sm text-gray-500 mt-1">
+          {{ editingPackage ? 'Update plan details' : 'Set up a new subscription plan for realtors' }}
+        </p>
+      </div>
+    </div>
+    <button class="text-gray-400 hover:text-gray-600 transition-colors" (click)="closeModal()">
+      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Package Name -->
+    <div class="form-group mb-0 lg:col-span-2">
+      <label class="block text-sm font-medium text-gray-700 mb-1">
+        Package Name <span class="text-red-500">*</span>
+      </label>
+      <input
+        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-shadow"
+        [(ngModel)]="form.name" placeholder="e.g. Pro Realtor Plan"
+        [class.border-red-500]="submitted && !form.name.trim()" />
+      <small class="text-red-500 text-xs mt-1 block" *ngIf="submitted && !form.name.trim()">⚠️ Name is required</small>
+    </div>
+
+    <!-- Description -->
+    <div class="form-group mb-0 lg:col-span-3">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+      <textarea
+        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-shadow resize-none"
+        [(ngModel)]="form.description" rows="2" placeholder="Brief description of this plan…"></textarea>
+    </div>
+
+    <!-- Price (USD) -->
+    <div class="form-group mb-0">
+      <label class="block text-sm font-medium text-gray-700 mb-1">
+        Price (USD) <span class="text-red-500">*</span>
+      </label>
+      <div class="relative">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
+        <input
+          class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-shadow"
+          type="number" min="1" [(ngModel)]="form.price" placeholder="49"
+          [class.border-red-500]="submitted && form.price <= 0" />
+      </div>
+      <small class="text-red-500 text-xs mt-1 block" *ngIf="submitted && form.price <= 0">⚠️ Price must be > 0</small>
+    </div>
+
+    <!-- Duration (Days) -->
+    <div class="form-group mb-0">
+      <label class="block text-sm font-medium text-gray-700 mb-1">
+        Duration (Days) <span class="text-red-500">*</span>
+      </label>
+      <input
+        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-shadow"
+        type="number" min="1" [(ngModel)]="form.durationDays" placeholder="30"
+        [class.border-red-500]="submitted && form.durationDays <= 0" />
+      <small class="text-red-500 text-xs mt-1 block" *ngIf="submitted && form.durationDays <= 0">⚠️ Required</small>
+    </div>
+
+    <!-- Max Ads -->
+    <div class="form-group mb-0">
+      <label class="block text-sm font-medium text-gray-700 mb-1">
+        Max Ads <span class="text-red-500">*</span>
+      </label>
+      <input
+        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-shadow"
+        type="number" min="1" [(ngModel)]="form.maxAds" placeholder="10"
+        [class.border-red-500]="submitted && form.maxAds <= 0" />
+      <small class="text-red-500 text-xs mt-1 block" *ngIf="submitted && form.maxAds <= 0">⚠️ Required</small>
+      <small class="text-gray-400 text-xs mt-1 block">Use 999 for unlimited</small>
+    </div>
+
+    <!-- Max Images -->
+    <div class="form-group mb-0">
+      <label class="block text-sm font-medium text-gray-700 mb-1">
+        Max Images (Total) <span class="text-red-500">*</span>
+      </label>
+      <input
+        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-shadow"
+        type="number" min="1" [(ngModel)]="form.maxImages" placeholder="50"
+        [class.border-red-500]="submitted && form.maxImages <= 0" />
+      <small class="text-red-500 text-xs mt-1 block" *ngIf="submitted && form.maxImages <= 0">⚠️ Required</small>
+      <small class="text-gray-400 text-xs mt-1 block">Use 999 for unlimited</small>
+    </div>
+
+    <!-- Max Images Per Ad -->
+    <div class="form-group mb-0">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Max Images Per Ad</label>
+      <input
+        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-shadow"
+        type="number" min="1" [(ngModel)]="form.maxImagesPerAd" placeholder="5" />
+      <small class="text-gray-400 text-xs mt-1 block">Limit per listing (default: 5)</small>
+    </div>
+
+    <!-- Toggles (Active & Featured) -->
+    <div class="form-group mb-0 flex flex-col gap-4 justify-center">
+      <!-- Is Active -->
+      <label class="flex items-center gap-3 cursor-pointer group">
+        <div class="relative">
+          <input type="checkbox" class="sr-only" [checked]="form.isActive" (change)="form.isActive = !form.isActive" />
+          <div class="w-10 h-5 bg-gray-200 rounded-full transition-colors group-hover:bg-gray-300"
+            [class.bg-green-500]="form.isActive"></div>
+          <div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform transform"
+            [class.translate-x-5]="form.isActive"></div>
+        </div>
+        <div>
+          <div class="text-sm font-semibold text-gray-800">Active</div>
+          <div class="text-xs text-gray-500">Visible to agents</div>
+        </div>
+      </label>
+
+      <!-- Is Featured -->
+      <label class="flex items-center gap-3 cursor-pointer group">
+        <div class="relative">
+          <input type="checkbox" class="sr-only" [checked]="form.isFeatured"
+            (change)="form.isFeatured = !form.isFeatured" />
+          <div class="w-10 h-5 bg-gray-200 rounded-full transition-colors group-hover:bg-gray-300"
+            [class.bg-blue-500]="form.isFeatured"></div>
+          <div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform transform"
+            [class.translate-x-5]="form.isFeatured"></div>
+        </div>
+        <div>
+          <div class="text-sm font-semibold text-gray-800">Featured</div>
+          <div class="text-xs text-gray-500">Highlighted with ⭐ badge</div>
+        </div>
+      </label>
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
+    <button
+      class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+      (click)="closeModal()" [disabled]="saving">
+      Cancel
+    </button>
+    <button
+      class="px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary flex items-center gap-2 transition-colors"
+      (click)="savePackage()" [disabled]="saving">
+      <div class="spinner" *ngIf="saving"
+        style="width:16px;height:16px;border-width:2px;border-color:white;border-top-color:transparent"></div>
+      <svg *ngIf="!saving" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+        stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m5 13 4 4L19 7" />
+      </svg>
+      {{ saving ? 'Saving…' : (editingPackage ? 'Save Changes' : 'Create Package') }}
+    </button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container">
+  <div class="toast" [ngClass]="toast.type" *ngFor="let toast of toasts">
+    {{ toast.type === 'success' ? '✅' : '❌' }} {{ toast.message }}
+  </div>
+</div>

@@ -1,0 +1,266 @@
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <div class="breadcrumb">
+            <a routerLink="/visitor/home">Home</a>
+            <span>/</span>
+            <span>Properties</span>
+        </div>
+        <h1 class="page-title">Browse Properties</h1>
+        <p class="page-subtitle">Discover your perfect property from our extensive collection</p>
+    </div>
+</section>
+
+<!-- Filters and Properties -->
+<section class="properties-section">
+    <div class="container">
+        <div class="properties-layout">
+
+            <!-- Sidebar Filters (UI only) -->
+            <aside class="filters-sidebar">
+                <div class="filter-header">
+                    <h3>Filter Properties</h3>
+                    <button class="btn-reset" id="resetFilters">Reset All</button>
+                </div>
+
+                <div class="filter-group">
+                    <h4 class="filter-title">Property Type</h4>
+                    <div class="filter-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" value="house" class="property-type-filter">
+                            <span>Houses</span><span class="count">(567)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" value="apartment" class="property-type-filter">
+                            <span>Apartments</span><span class="count">(892)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" value="villa" class="property-type-filter">
+                            <span>Villas</span><span class="count">(145)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" value="office" class="property-type-filter">
+                            <span>Office Space</span><span class="count">(234)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" value="shop" class="property-type-filter">
+                            <span>Shops</span><span class="count">(189)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" value="industrial" class="property-type-filter">
+                            <span>Industrial</span><span class="count">(98)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <h4 class="filter-title">Purpose</h4>
+                    <div class="filter-options">
+                        <label class="radio-label">
+                            <input type="radio" name="purpose" value="all" checked>
+                            <span>All</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="purpose" value="sale">
+                            <span>For Sale</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="purpose" value="rent">
+                            <span>For Rent</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <h4 class="filter-title">Price Range</h4>
+                    <div class="price-inputs">
+                        <input type="number" placeholder="Min Price" id="minPrice" class="price-input">
+                        <span>-</span>
+                        <input type="number" placeholder="Max Price" id="maxPrice" class="price-input">
+                    </div>
+                    <div class="price-range-slider">
+                        <input type="range" min="0" max="100000000" step="100000" id="priceRange" class="range-slider">
+                        <div class="range-labels">
+                            <span>PKR 0</span>
+                            <span>PKR 10Cr+</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <h4 class="filter-title">Bedrooms</h4>
+                    <div class="filter-buttons">
+                        <button class="filter-btn" data-beds="1">1</button>
+                        <button class="filter-btn" data-beds="2">2</button>
+                        <button class="filter-btn" data-beds="3">3</button>
+                        <button class="filter-btn" data-beds="4">4</button>
+                        <button class="filter-btn" data-beds="5">5+</button>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <h4 class="filter-title">Area (sq ft)</h4>
+                    <div class="price-inputs">
+                        <input type="number" placeholder="Min" id="minArea" class="price-input">
+                        <span>-</span>
+                        <input type="number" placeholder="Max" id="maxArea" class="price-input">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <h4 class="filter-title">Location</h4>
+                    <select class="filter-select" id="cityFilter">
+                        <option value="">All Cities</option>
+                        <option value="islamabad">Islamabad</option>
+                        <option value="rawalpindi">Rawalpindi</option>
+                        <option value="lahore">Lahore</option>
+                        <option value="karachi">Karachi</option>
+                        <option value="multan">Multan</option>
+                        <option value="faisalabad">Faisalabad</option>
+                    </select>
+                </div>
+
+                <button class="btn-apply-filters">Apply Filters</button>
+            </aside>
+
+            <!-- Properties Content -->
+            <div class="properties-content">
+
+                <!-- Toolbar -->
+                <div class="properties-toolbar">
+                    <div class="results-info">
+                        <span class="results-count" *ngIf="!loading">
+                            Showing <strong>{{ filteredListings.length }}</strong> properties
+                        </span>
+                        <span *ngIf="loading">Loading properties...</span>
+                    </div>
+                    <div class="toolbar-actions">
+                        <select class="sort-select" id="sortBy" (change)="onSortChange($event)">
+                            <option value="newest">Newest First</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                        </select>
+                        <div class="view-toggle">
+                            <button class="view-btn active" data-view="grid">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <rect x="2" y="2" width="7" height="7" stroke="currentColor" stroke-width="2"/>
+                                    <rect x="11" y="2" width="7" height="7" stroke="currentColor" stroke-width="2"/>
+                                    <rect x="2" y="11" width="7" height="7" stroke="currentColor" stroke-width="2"/>
+                                    <rect x="11" y="11" width="7" height="7" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                            </button>
+                            <button class="view-btn" data-view="list">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <rect x="2" y="3" width="16" height="3" stroke="currentColor" stroke-width="2"/>
+                                    <rect x="2" y="8.5" width="16" height="3" stroke="currentColor" stroke-width="2"/>
+                                    <rect x="2" y="14" width="16" height="3" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div *ngIf="loading" class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading properties...</p>
+                </div>
+
+                <!-- Error State -->
+                <div *ngIf="errorMessage" class="error-state">
+                    <p>❌ {{ errorMessage }}</p>
+                </div>
+
+                <!-- ✅ DYNAMIC Properties Grid from Backend -->
+                <div class="properties-grid-list" id="propertiesContainer" *ngIf="!loading && filteredListings.length > 0">
+                    <div class="property-card" *ngFor="let listing of filteredListings">
+                        <div class="property-image">
+                            <img
+                                [src]="listing.thumbnail ? 'http://localhost:5183' + listing.thumbnail : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800'"
+                                [alt]="listing.title"
+                                onerror="this.src='https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800'"
+                            >
+                            <span class="property-badge">Approved</span>
+                            <button class="property-favorite">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.27 2 8.5C2 5.41 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5C22 12.27 18.6 15.36 13.45 20.03L12 21.35Z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="property-content">
+                            <h3 class="property-title">{{ listing.title }}</h3>
+                            <p class="property-location">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M8 1C5.24 1 3 3.24 3 6C3 9.75 8 15 8 15C8 15 13 9.75 13 6C13 3.24 10.76 1 8 1ZM8 7.5C7.17 7.5 6.5 6.83 6.5 6C6.5 5.17 7.17 4.5 8 4.5C8.83 4.5 9.5 5.17 9.5 6C9.5 6.83 8.83 7.5 8 7.5Z" fill="currentColor"/>
+                                </svg>
+                                {{ listing.category || 'Pakistan' }}
+                            </p>
+                            <div class="property-features">
+                                <span class="feature">
+                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                        <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5"/>
+                                    </svg>
+                                    {{ listing.sellerName || 'Verified Seller' }}
+                                </span>
+                            </div>
+                            <div class="property-footer">
+                                <span class="property-price">PKR {{ listing.price | number }}</span>
+                                <a [routerLink]="['/visitor/listing-details', listing.id]">
+                                    <button class="btn-view">View Details</button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- No Data -->
+                <div *ngIf="!loading && filteredListings.length === 0 && !errorMessage" class="empty-state">
+                    <p>No approved properties found.</p>
+                </div>
+
+                <!-- Pagination (static UI) -->
+                <div class="pagination" *ngIf="!loading && filteredListings.length > 0">
+                    <button class="pagination-btn" disabled>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M12.5 5L7.5 10L12.5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <button class="pagination-btn active">1</button>
+                    <button class="pagination-btn">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Loading & Empty State CSS (inline for quick use) -->
+<style>
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4rem;
+    color: #6b7280;
+    gap: 1rem;
+}
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid #e8f5f1;
+    border-top-color: #50c878;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-state, .error-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6b7280;
+    font-size: 1.1rem;
+}
+</style>

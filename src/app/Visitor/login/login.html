@@ -1,0 +1,152 @@
+<!-- Animated Background -->
+<div class="auth-background">
+  <div class="gradient-orb orb-1"></div>
+  <div class="gradient-orb orb-2"></div>
+  <div class="gradient-orb orb-3"></div>
+</div>
+
+<!-- Main Container -->
+<div class="auth-container">
+  <!-- Left Side - Branding -->
+  <div class="auth-left">
+    <div class="branding">
+      <div class="logo">
+        <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+          <path d="M30 8L52 22V52H38V38H22V52H8V22L30 8Z" fill="white" />
+        </svg>
+      </div>
+      <h1>Realtors Portal</h1>
+      <p class="tagline">Your trusted partner in real estate excellence</p>
+    </div>
+
+    <div class="features">
+      <div class="feature-item" data-animate style="animation-delay: 0.2s">
+        <div class="feature-icon">🏠</div>
+        <div class="feature-content">
+          <h3>2,500+ Properties</h3>
+          <p>Premium listings nationwide</p>
+        </div>
+      </div>
+      <div class="feature-item" data-animate style="animation-delay: 0.4s">
+        <div class="feature-icon">👥</div>
+        <div class="feature-content">
+          <h3>850+ Clients</h3>
+          <p>Trust our platform</p>
+        </div>
+      </div>
+      <div class="feature-item" data-animate style="animation-delay: 0.6s">
+        <div class="feature-icon">⭐</div>
+        <div class="feature-content">
+          <h3>120+ Agents</h3>
+          <p>Professional experts</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial" data-animate style="animation-delay: 0.8s">
+      <div class="quote-icon">"</div>
+      <p class="quote-text">
+        The best platform for real estate. Found my dream home in just 2 weeks!
+      </p>
+      <div class="author">
+        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100" alt="Client" />
+        <div>
+          <strong>Sara Ahmed</strong>
+          <span>Property Owner</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side - Login Form -->
+  <div class="auth-right">
+    <div class="auth-form-container">
+      <div class="form-header">
+        <h2>Welcome Back</h2>
+        <p>Login to your account to continue</p>
+      </div>
+
+      <!-- ✅ Success Alert -->
+      <div class="alert alert-success" *ngIf="successMessage">
+        ✅ {{ successMessage }}
+      </div>
+
+      <!-- ❌ Error Alert -->
+      <div class="alert alert-error" *ngIf="errorMessage">
+        ❌ {{ errorMessage }}
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+
+        <!-- Email Input -->
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="2" />
+              <path d="M2 6L10 11L18 6" stroke="currentColor" stroke-width="2" />
+            </svg>
+            <input
+              type="email"
+              id="email"
+              placeholder="Enter your email"
+              formControlName="email"
+            />
+          </div>
+          <span class="field-error" *ngIf="email?.invalid && email?.touched">
+            Please enter a valid email address
+          </span>
+        </div>
+
+        <!-- Password Input -->
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="4" y="8" width="12" height="10" rx="2" stroke="currentColor" stroke-width="2" />
+              <path d="M7 8V6C7 4.34315 8.34315 3 10 3C11.6569 3 13 4.34315 13 6V8"
+                stroke="currentColor" stroke-width="2" />
+            </svg>
+            <input
+              type="password"
+              id="password"
+              placeholder="Enter your password"
+              formControlName="password"
+            />
+          </div>
+          <span class="field-error" *ngIf="password?.invalid && password?.touched">
+            Password must be at least 6 characters
+          </span>
+        </div>
+
+        <!-- Remember & Forgot -->
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" id="remember" />
+            <span class="checkmark"></span>
+            <span>Remember me</span>
+          </label>
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <!-- Submit Button with Loading State -->
+        <button type="submit" class="btn-submit" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Login</span>
+          <span *ngIf="isLoading">Logging in...</span>
+          <svg *ngIf="!isLoading" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M4 10H16M16 10L12 6M16 10L12 14"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
+
+        <!-- Signup Link -->
+        <div class="form-footer">
+          <p>
+            Don't have an account?
+            <a routerLink="/visitor/signup" class="signup-link">Create Account</a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

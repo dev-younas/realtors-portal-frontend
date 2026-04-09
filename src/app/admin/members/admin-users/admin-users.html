@@ -1,0 +1,137 @@
+<div class="page-wrapper">
+  <div class="accent-bar"></div>
+
+  <div class="page-header">
+    <div class="page-title-block">
+      <h1>Admin Users</h1>
+      <p>Manage administrator accounts and permissions</p>
+    </div>
+    <div class="toolbar">
+      <div class="search-box">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg>
+        <input type="text" placeholder="Search admins…" [(ngModel)]="searchTerm" (input)="onSearch()" />
+      </div>
+      <button class="btn btn-primary" (click)="openCreateModal()">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        Invite Admin
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">🛡️</div>
+      <div class="stat-value">{{ admins.length }}</div>
+      <div class="stat-label">Total Admins</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">👑</div>
+      <div class="stat-value">{{ superAdminCount }}</div>
+      <div class="stat-label">Super Admins</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🟢</div>
+      <div class="stat-value">{{ activeAdminCount }}</div>
+      <div class="stat-label">Active Now</div>
+      <div class="stat-badge up">Online</div>
+    </div>
+  </div>
+
+  <!-- Inline Create/Edit Form -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6" *ngIf="showModal">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-semibold">{{ editingAdmin ? 'Edit Admin' : 'Invite Admin' }}</h2>
+      <button class="text-gray-400 hover:text-gray-600 transition-colors" (click)="closeModal()">
+        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div class="form-group mb-0">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+        <input
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
+          [(ngModel)]="form.fullName" placeholder="John Smith" />
+      </div>
+      <div class="form-group mb-0">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+        <input
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
+          type="email" [(ngModel)]="form.email" placeholder="admin@realtors.com" />
+      </div>
+      <div class="form-group mb-0">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+        <select
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary bg-white"
+          [(ngModel)]="form.role">
+          <option value="Admin">Admin</option>
+          <option value="SuperAdmin">Super Admin</option>
+        </select>
+      </div>
+      <div class="form-group mb-0" *ngIf="!editingAdmin">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Temporary Password</label>
+        <input
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
+          type="password" [(ngModel)]="form.password" placeholder="••••••••" />
+      </div>
+    </div>
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
+      <button
+        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+        (click)="closeModal()">Cancel</button>
+      <button
+        class="px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary flex items-center gap-2"
+        (click)="saveAdmin()" [disabled]="saving">
+        <div class="spinner" *ngIf="saving"
+          style="width:16px;height:16px;border-width:2px;border-color:white;border-top-color:transparent"></div>
+        {{ editingAdmin ? 'Save Changes' : 'Send Invite' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Admins Grid -->
+  <div *ngIf="loading" class="card">
+    <div class="loading-overlay">
+      <div class="spinner"></div> Loading…
+    </div>
+  </div>
+
+  <div class="admins-grid" *ngIf="!loading">
+    <div class="admin-card" *ngFor="let admin of filteredAdmins">
+      <div class="admin-header">
+        <div class="avatar avatar-lg">{{ getInitials(admin.fullName) }}</div>
+        <div class="online-dot" [class.online]="admin.isOnline"></div>
+      </div>
+      <div class="admin-body">
+        <h3>{{ admin.fullName }}</h3>
+        <p class="admin-email">{{ admin.email }}</p>
+        <div class="admin-role">
+          <span class="badge" [ngClass]="admin.role === 'SuperAdmin' ? 'badge-approved' : 'badge-emerald'">
+            {{ admin.role === 'SuperAdmin' ? '👑 ' : '🛡️ ' }}{{ admin.role }}
+          </span>
+        </div>
+        <div class="admin-meta">
+          <span>Last login: {{ admin.lastLogin | date:'MMM d, y' }}</span>
+        </div>
+      </div>
+      <div class="admin-footer">
+        <button class="btn btn-outline btn-sm" style="flex:1" (click)="editAdmin(admin)">Edit</button>
+        <button class="btn btn-danger btn-sm" *ngIf="admin.role !== 'SuperAdmin'"
+          (click)="removeAdmin(admin)">Remove</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container">
+  <div class="toast" [ngClass]="t.type" *ngFor="let t of toasts">
+    {{ t.type === 'success' ? '✅' : '❌' }} {{ t.message }}
+  </div>
+</div>

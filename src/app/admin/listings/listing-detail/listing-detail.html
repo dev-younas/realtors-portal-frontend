@@ -1,0 +1,83 @@
+<div class="page-wrapper">
+  <div class="accent-bar"></div>
+
+  <div class="page-header">
+    <div class="page-title-block">
+      <h1>Listing Detail</h1>
+      <p>Full property information and approval actions</p>
+    </div>
+    <div class="toolbar">
+      <button class="btn btn-ghost" routerLink="/admin/listings/list">← Back</button>
+      <button class="btn btn-primary" *ngIf="listing?.status === 'Pending'" (click)="approve()">Approve</button>
+      <button class="btn btn-danger"  *ngIf="listing?.status === 'Pending'" (click)="reject()">Reject</button>
+    </div>
+  </div>
+
+  <div class="loading-overlay" *ngIf="loading"><div class="spinner"></div> Loading…</div>
+
+  <div class="detail-grid" *ngIf="!loading && listing">
+    <!-- Left -->
+    <div>
+      <!-- Images -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><span class="card-title">Images</span></div>
+        <div class="images-grid" *ngIf="listing.images.length; else noImages">
+          <img *ngFor="let img of listing.images" [src]="img" alt="listing image" class="listing-img" />
+        </div>
+        <ng-template #noImages>
+          <div class="empty-state"><div class="empty-icon">📷</div><h3>No images uploaded</h3></div>
+        </ng-template>
+      </div>
+
+      <!-- Description -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Description</span></div>
+        <div style="padding:20px;color:var(--text-light);font-size:0.875rem;line-height:1.7">
+          {{ listing.description }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Property Info</span>
+          <span class="badge"
+            [ngClass]="{
+              'badge-approved': listing.status === 'Approved',
+              'badge-pending':  listing.status === 'Pending',
+              'badge-rejected': listing.status === 'Rejected'
+            }">{{ listing.status }}</span>
+        </div>
+        <div class="info-list">
+          <div class="info-row"><span class="info-label">Title</span><span class="info-val">{{ listing.title }}</span></div>
+          <div class="info-row"><span class="info-label">Category</span><span class="info-val"><span class="badge badge-emerald">{{ listing.category }}</span></span></div>
+          <div class="info-row"><span class="info-label">Price</span><span class="info-val price-tag">${{ listing.price | number }}</span></div>
+          <div class="info-row"><span class="info-label">Location</span><span class="info-val">{{ listing.location }}</span></div>
+          <div class="info-row"><span class="info-label">Area</span><span class="info-val">{{ listing.area }} sq ft</span></div>
+          <div class="info-row"><span class="info-label">Bedrooms</span><span class="info-val">{{ listing.bedrooms }}</span></div>
+          <div class="info-row"><span class="info-label">Bathrooms</span><span class="info-val">{{ listing.bathrooms }}</span></div>
+          <div class="info-row"><span class="info-label">Listed</span><span class="info-val">{{ listing.createdAt | date:'MMM d, y' }}</span></div>
+        </div>
+      </div>
+
+      <!-- Agent Info -->
+      <div class="card" style="margin-top:18px">
+        <div class="card-header"><span class="card-title">Agent Details</span></div>
+        <div class="agent-info">
+          <div class="avatar" style="width:48px;height:48px;font-size:1rem">{{ getInitials(listing.agentName) }}</div>
+          <div>
+            <div style="font-weight:600;color:var(--forest-night)">{{ listing.agentName }}</div>
+            <div style="font-size:0.82rem;color:var(--text-light)">{{ listing.agentEmail }}</div>
+            <div style="font-size:0.82rem;color:var(--text-light);margin-top:2px">{{ listing.agentPhone }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container">
+  <div class="toast" [ngClass]="t.type" *ngFor="let t of toasts">{{ t.type === 'success' ? '✅' : '❌' }} {{ t.message }}</div>
+</div>

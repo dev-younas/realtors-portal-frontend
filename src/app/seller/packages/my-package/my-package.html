@@ -1,0 +1,111 @@
+<div class="page-wrapper space-y-6">
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div>
+      <div class="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-800">Private Seller</div>
+      <h1 class="mt-3 text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">My Subscription</h1>
+      <p class="mt-1 text-sm text-slate-600">Your current package and usage</p>
+    </div>
+    <div>
+      <a routerLink="/seller/packages/plans" class="inline-flex items-center gap-2 rounded-xl border border-transparent bg-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-violet-700">Upgrade Plan</a>
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-slate-200 bg-white p-8 text-center" *ngIf="loading">
+    <div class="spinner mx-auto"></div>
+    <p class="text-slate-600 mt-2">Loading…</p>
+  </div>
+
+  <div class="rounded-2xl border border-slate-200 bg-white p-8 max-w-md mx-auto" *ngIf="!loading && noSub">
+    <div class="text-4xl mb-2">📦</div>
+    <h3 class="font-bold text-slate-900">No Active Subscription</h3>
+    <p class="text-sm text-slate-600 mt-1">You don't have an active package. Buy a plan to start posting ads.</p>
+    <a routerLink="/seller/packages/plans" class="inline-flex mt-5 rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700">Browse Plans</a>
+  </div>
+
+  <ng-container *ngIf="!loading && subscription">
+    <!-- Status banner -->
+    <div class="rounded-2xl border-2 p-6 flex flex-wrap items-center justify-between gap-4" [class.border-emerald-200]="subscription.isActive" [class.bg-emerald-50/50]="subscription.isActive" [class.border-slate-200]="!subscription.isActive" [class.bg-slate-50]="!subscription.isActive">
+      <div class="flex items-center gap-4">
+        <div class="grid h-12 w-12 place-items-center rounded-xl text-2xl" [class.bg-emerald-100]="subscription.isActive" [class.bg-slate-200]="!subscription.isActive">{{ subscription.isActive ? '✅' : '❌' }}</div>
+        <div>
+          <div class="text-lg font-bold text-slate-900">{{ subscription.packageName }} Plan</div>
+          <div class="text-sm text-slate-600">{{ subscription.isActive ? 'Active' : 'Expired' }} · {{ daysLeft }} days remaining</div>
+        </div>
+      </div>
+      <div class="text-right">
+        <span class="text-2xl font-extrabold text-slate-900">${{ subscription.price }}</span>
+        <span class="text-slate-500">/plan</span>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="grid h-10 w-10 place-items-center rounded-xl bg-violet-50 text-violet-700">📢</div>
+        <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ subscription.remainingAds }}</div>
+        <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Remaining Ads</div>
+      </div>
+      <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="grid h-10 w-10 place-items-center rounded-xl bg-sky-50 text-sky-700">🖼️</div>
+        <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ subscription.maxImages === 999 ? '∞' : subscription.maxImages }}</div>
+        <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Max Images</div>
+      </div>
+      <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-amber-700">📸</div>
+        <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ subscription.maxImagesPerAd }}</div>
+        <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Images Per Ad</div>
+      </div>
+      <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="flex items-start justify-between">
+          <div class="grid h-10 w-10 place-items-center rounded-xl bg-violet-50 text-violet-700">📅</div>
+          <span class="inline-flex items-center rounded-full bg-rose-50 px-2.5 py-1 text-[11px] font-bold text-rose-700" *ngIf="daysLeft < 7 && daysLeft > 0">Expiring soon</span>
+        </div>
+        <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ daysLeft }}</div>
+        <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Days Left</div>
+      </div>
+    </div>
+
+    <!-- Usage Details Card -->
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      <div class="border-b border-slate-100 px-5 py-4">
+        <span class="text-base font-bold text-slate-900">Usage Details</span>
+      </div>
+      <div class="p-6 space-y-6">
+        <div>
+          <div class="flex items-center justify-between text-sm mb-1">
+            <span class="font-medium text-slate-600">Ads Used</span>
+            <span class="font-semibold text-slate-900">{{ subscription.maxAds - subscription.remainingAds }} / {{ subscription.maxAds === 999 ? '∞' : subscription.maxAds }}</span>
+          </div>
+          <div class="h-2 rounded-full bg-slate-100 overflow-hidden">
+            <div class="h-full rounded-full transition-all" [style.width.%]="adsUsedPercent" [class.bg-rose-500]="adsUsedPercent > 80" [class.bg-emerald-500]="adsUsedPercent <= 80"></div>
+          </div>
+          <div class="text-xs text-slate-500 mt-1">{{ subscription.remainingAds }} ads remaining</div>
+        </div>
+        <div>
+          <div class="flex items-center justify-between text-sm mb-1">
+            <span class="font-medium text-slate-600">Days Remaining</span>
+            <span class="font-semibold text-slate-900">{{ daysLeft }} / {{ subscription.durationDays }}</span>
+          </div>
+          <div class="h-2 rounded-full bg-slate-100 overflow-hidden">
+            <div class="h-full rounded-full transition-all" [style.width.%]="daysPercent" [class.bg-rose-500]="daysPercent < 20" [class.bg-emerald-500]="daysPercent >= 20"></div>
+          </div>
+          <div class="text-xs text-slate-500 mt-1">Expires {{ subscription.endDate | date:'MMM d, y' }}</div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 px-5 pb-5 border-t border-slate-100 pt-4">
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Started</span>
+          <div class="text-sm font-semibold text-slate-900 mt-0.5">{{ subscription.startDate | date:'MMM d, y' }}</div>
+        </div>
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Expires</span>
+          <div class="text-sm font-semibold text-slate-900 mt-0.5">{{ subscription.endDate | date:'MMM d, y' }}</div>
+        </div>
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Description</span>
+          <div class="text-xs text-slate-700 mt-0.5">{{ subscription.description }}</div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

@@ -1,0 +1,182 @@
+<div class="page-wrapper">
+  <div class="accent-bar"></div>
+
+  <div class="page-header">
+    <div class="page-title-block">
+      <h1>Statistics</h1>
+      <p>Platform analytics and performance overview</p>
+    </div>
+    <div class="toolbar">
+      <select
+        class="form-control"
+        style="width: auto; padding: 8px 14px; font-size: 0.875rem"
+        [(ngModel)]="period"
+        (change)="loadStats()"
+      >
+        <option value="7">Last 7 days</option>
+        <option value="30">Last 30 days</option>
+        <option value="90">Last 90 days</option>
+        <option value="365">Last year</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="stats-row" style="margin-bottom: 32px">
+    <div class="stat-card" *ngFor="let kpi of kpis">
+      <div class="stat-icon">{{ kpi.icon }}</div>
+      <div class="stat-value">{{ kpi.value }}</div>
+      <div class="stat-label">{{ kpi.label }}</div>
+      <div class="stat-badge" [ngClass]="kpi.trend > 0 ? 'up' : 'down'">
+        {{ kpi.trend > 0 ? '↑' : '↓' }} {{ kpi.trend | number: '1.1-1' }}%
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="charts-row">
+    <!-- Revenue Chart -->
+    <div class="card chart-card">
+      <div class="card-header">
+        <span class="card-title">Revenue Over Time</span>
+        <span class="badge badge-emerald">Monthly</span>
+      </div>
+      <div class="chart-body">
+        <div class="bar-chart" *ngIf="revenueData.length">
+          <div class="bar-group" *ngFor="let d of revenueData">
+            <div class="bar-fill" [style.height.%]="d.pct" [title]="'$' + d.value">
+              <div class="bar-tooltip">${{ d.value }}</div>
+            </div>
+            <div class="bar-label">{{ d.label }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Listings by Status -->
+    <div class="card chart-card">
+      <div class="card-header">
+        <span class="card-title">Listings by Status</span>
+      </div>
+      <div class="chart-body donut-body">
+        <svg class="donut-chart" viewBox="0 0 200 200">
+          <circle
+            cx="100"
+            cy="100"
+            r="70"
+            fill="none"
+            stroke="var(--light-gray)"
+            stroke-width="28"
+          />
+          <circle
+            [attr.stroke-dasharray]="approvedArc + ' ' + circumference"
+            [attr.stroke-dashoffset]="-circumference * 0.25"
+          ></circle>
+          <circle
+            [attr.stroke-dasharray]="pendingArc + ' ' + circumference"
+            [attr.stroke-dashoffset]="-(circumference * 0.25 + approvedArc)"
+          ></circle>
+          <text
+            x="100"
+            y="98"
+            text-anchor="middle"
+            font-size="22"
+            font-weight="700"
+            fill="var(--forest-night)"
+          >
+            {{ listingStats.total }}
+          </text>
+          <text x="100" y="116" text-anchor="middle" font-size="11" fill="var(--text-light)">
+            Total
+          </text>
+        </svg>
+        <div class="donut-legend">
+          <div class="legend-item">
+            <span class="legend-dot" style="background: var(--emerald-green)"></span>
+            <span>Approved ({{ listingStats.approved }})</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot" style="background: var(--deep-emerald)"></span>
+            <span>Pending ({{ listingStats.pending }})</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot" style="background: var(--light-gray)"></span>
+            <span>Rejected ({{ listingStats.rejected }})</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subscription Breakdown -->
+  <div class="card" style="margin-top: 22px">
+    <div class="card-header">
+      <span class="card-title">Subscription Breakdown</span>
+    </div>
+    <div class="sub-breakdown">
+      <div class="sub-row" *ngFor="let s of subscriptionBreakdown">
+        <div class="sub-name">{{ s.name }}</div>
+        <div class="sub-bar-wrap">
+          <div class="sub-bar-fill" [style.width.%]="s.pct"></div>
+        </div>
+        <div class="sub-count">
+          {{ s.count }} <span style="color: var(--text-light)">users</span>
+        </div>
+        <div class="sub-revenue">${{ s.revenue | number }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Agents Table -->
+  <div class="card" style="margin-top: 22px">
+    <div class="card-header">
+      <span class="card-title">Top Performing Agents</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Agent</th>
+            <th>Listings</th>
+            <th>Approved</th>
+            <th>Revenue Generated</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let a of topAgents; let i = index">
+            <td>
+              <span
+                class="rank-badge"
+                [ngClass]="i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''"
+              >
+                {{ i + 1 }}
+              </span>
+            </td>
+            <td>
+              <div class="user-cell">
+                <div class="avatar">{{ getInitials(a.name) }}</div>
+                <div class="user-info">
+                  <div class="name">{{ a.name }}</div>
+                  <div class="email">{{ a.plan }}</div>
+                </div>
+              </div>
+            </td>
+            <td>{{ a.listings }}</td>
+            <td>
+              <span class="badge badge-approved">{{ a.approved }}</span>
+            </td>
+            <td style="font-weight: 600">${{ a.revenue | number }}</td>
+            <td>
+              <div class="score-bar">
+                <div class="score-fill" [style.width.%]="a.score"></div>
+                <span>{{ a.score }}</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,152 @@
+<div class="page-wrapper">
+  <div class="accent-bar"></div>
+
+  <div class="page-header">
+    <div class="page-title-block">
+      <h1>Agents</h1>
+      <p>Manage registered real estate agents and their approvals</p>
+    </div>
+    <div class="toolbar">
+      <div class="search-box">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" placeholder="Search agents…" [(ngModel)]="searchTerm" (input)="onSearch()" />
+      </div>
+      <select class="form-control" style="width:auto;padding:8px 12px;font-size:0.875rem" [(ngModel)]="statusFilter" (change)="onSearch()">
+        <option value="">All Status</option>
+        <option value="approved">Approved</option>
+        <option value="pending">Pending</option>
+        <option value="rejected">Rejected</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">🏠</div>
+      <div class="stat-value">{{ agents.length }}</div>
+      <div class="stat-label">Total Agents</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-value">{{ approvedCount }}</div>
+      <div class="stat-label">Approved</div>
+      <div class="stat-badge up">Active</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-value">{{ pendingCount }}</div>
+      <div class="stat-label">Pending Review</div>
+      <div class="stat-badge neu" *ngIf="pendingCount > 0">Needs action</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📋</div>
+      <div class="stat-value">{{ totalListings }}</div>
+      <div class="stat-label">Total Listings</div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Agent Directory</span>
+      <span style="font-size:0.82rem;color:var(--text-light)">{{ filteredAgents.length }} agents</span>
+    </div>
+
+    <div *ngIf="loading" class="loading-overlay">
+      <div class="spinner"></div> Loading agents…
+    </div>
+
+    <div class="table-wrap" *ngIf="!loading">
+      <table>
+        <thead>
+          <tr>
+            <th>Agent</th>
+            <th>License #</th>
+            <th>Agency</th>
+            <th>Listings</th>
+            <th>Subscription</th>
+            <th>Status</th>
+            <th>Joined</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let agent of paginatedAgents">
+            <td>
+              <div class="user-cell">
+                <div class="avatar">{{ getInitials(agent.fullName) }}</div>
+                <div class="user-info">
+                  <div class="name">{{ agent.fullName }}</div>
+                  <div class="email">{{ agent.email }}</div>
+                </div>
+              </div>
+            </td>
+            <td>{{ agent.licenseNumber }}</td>
+            <td>{{ agent.agencyName }}</td>
+            <td>{{ agent.listingCount }}</td>
+            <td>
+              <span class="badge badge-emerald">{{ agent.subscriptionPlan }}</span>
+            </td>
+            <td>
+              <span class="badge"
+                [ngClass]="{
+                  'badge-approved': agent.status === 'approved',
+                  'badge-pending': agent.status === 'pending',
+                  'badge-rejected': agent.status === 'rejected'
+                }">
+                {{ agent.status | titlecase }}
+              </span>
+            </td>
+            <td style="color:var(--text-light);font-size:0.82rem">{{ agent.joinedDate | date:'MMM d, y' }}</td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-xs"
+                  style="background:#dcfce7;color:#15803d;border:none"
+                  *ngIf="agent.status === 'pending'"
+                  (click)="approveAgent(agent)">
+                  Approve
+                </button>
+                <button class="btn btn-xs btn-danger"
+                  *ngIf="agent.status === 'pending'"
+                  (click)="rejectAgent(agent)">
+                  Reject
+                </button>
+                <button class="btn btn-xs btn-ghost" (click)="viewAgent(agent)">View</button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filteredAgents.length === 0">
+            <td colspan="8">
+              <div class="empty-state">
+                <div class="empty-icon">🏠</div>
+                <h3>No agents found</h3>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" *ngIf="!loading">
+      <span>Showing {{ pageStart }}–{{ pageEnd }} of {{ filteredAgents.length }}</span>
+      <div class="pagination-controls">
+        <button class="page-btn" [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">‹</button>
+        <button class="page-btn"
+          *ngFor="let p of pageNumbers"
+          [class.active]="p === currentPage"
+          (click)="setPage(p)">{{ p }}</button>
+        <button class="page-btn" [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container">
+  <div class="toast" [ngClass]="t.type" *ngFor="let t of toasts">
+    {{ t.type === 'success' ? '✅' : '❌' }} {{ t.message }}
+  </div>
+</div>

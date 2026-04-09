@@ -1,0 +1,70 @@
+<div class="page-wrapper space-y-6">
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div>
+      <div class="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-800">Private Seller</div>
+      <h1 class="mt-3 text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">Available Plans</h1>
+      <p class="mt-1 text-sm text-slate-600">Choose the package that fits your needs</p>
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-slate-200 bg-white p-8 text-center" *ngIf="loading">
+    <div class="spinner mx-auto"></div>
+    <p class="text-slate-600 mt-2">Loading plans…</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" *ngIf="!loading">
+    <div
+      *ngFor="let pkg of packages"
+      class="rounded-2xl border-2 bg-white p-6 shadow-sm transition hover:shadow-md flex flex-col"
+      [class.border-violet-300]="pkg.isFeatured"
+      [class.border-slate-200]="!pkg.isFeatured"
+    >
+      <div class="flex flex-wrap gap-2 mb-4">
+        <span *ngIf="pkg.isFeatured" class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">⭐ Most Popular</span>
+      </div>
+      <h3 class="text-xl font-bold text-slate-900">{{ pkg.name }}</h3>
+      <div class="mt-2 flex items-baseline gap-1">
+        <span class="text-3xl font-extrabold text-slate-900">${{ pkg.price }}</span>
+        <span class="text-slate-500">/{{ pkg.durationDays }}d</span>
+      </div>
+      <p class="mt-3 text-sm text-slate-600">{{ pkg.description }}</p>
+      <ul class="mt-4 space-y-2 text-sm text-slate-700 flex-1">
+        <li class="flex items-center gap-2">
+          <svg class="h-4 w-4 text-violet-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="m5 13 4 4L19 7"/></svg>
+          {{ pkg.maxAds === 999 ? 'Unlimited' : pkg.maxAds }} Ads
+        </li>
+        <li class="flex items-center gap-2">
+          <svg class="h-4 w-4 text-violet-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="m5 13 4 4L19 7"/></svg>
+          {{ pkg.maxImages === 999 ? 'Unlimited' : pkg.maxImages }} Total Images
+        </li>
+        <li class="flex items-center gap-2">
+          <svg class="h-4 w-4 text-violet-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="m5 13 4 4L19 7"/></svg>
+          {{ pkg.maxImagesPerAd }} Images per Ad
+        </li>
+        <li class="flex items-center gap-2">
+          <svg class="h-4 w-4 text-violet-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="m5 13 4 4L19 7"/></svg>
+          {{ pkg.durationDays }} Days Duration
+        </li>
+      </ul>
+      <div class="mt-4">
+        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold" [ngClass]="pkg.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'">{{ pkg.isActive ? 'Available' : 'Unavailable' }}</span>
+      </div>
+      <div class="mt-6 pt-4 border-t border-slate-100">
+        <button type="button" (click)="buy(pkg)" [disabled]="buying && buyingId === pkg.id" class="w-full rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-700 disabled:opacity-60 inline-flex items-center justify-center gap-2">
+          <div class="spinner" *ngIf="buying && buyingId === pkg.id" style="width:15px;height:15px;border-width:2px;border-color:rgba(255,255,255,0.3);border-top-color:#fff"></div>
+          {{ buying && buyingId === pkg.id ? 'Processing…' : 'Buy Now' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white p-8 col-span-full flex flex-col items-center justify-center" *ngIf="packages.length === 0">
+      <div class="text-4xl mb-2">📦</div>
+      <h3 class="font-bold text-slate-900">No packages available</h3>
+      <p class="text-sm text-slate-600 mt-1">Please check back later.</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container">
+  <div class="toast" [ngClass]="t.type" *ngFor="let t of toasts">{{ t.type==='success'?'✅':'❌' }} {{ t.message }}</div>
+</div>

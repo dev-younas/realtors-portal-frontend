@@ -1,0 +1,178 @@
+<div class="page-wrapper">
+  <div class="accent-bar"></div>
+
+  <div class="page-header">
+    <div class="page-title-block">
+      <h1>PayPal Settings</h1>
+      <p>Configure PayPal payment gateway integration</p>
+    </div>
+    <div class="toolbar">
+      <button class="btn btn-ghost" (click)="testConnection()" [disabled]="testing">
+        <div class="spinner" *ngIf="testing" style="width:16px;height:16px;border-width:2px"></div>
+        Test Connection
+      </button>
+      <button class="btn btn-primary" (click)="saveSettings()" [disabled]="saving">
+        <div class="spinner" *ngIf="saving" style="width:16px;height:16px;border-width:2px"></div>
+        Save Settings
+      </button>
+    </div>
+  </div>
+
+  <!-- Status Banner -->
+  <div class="status-banner" [ngClass]="settings.isConnected ? 'connected' : 'disconnected'">
+    <div class="status-icon">{{ settings.isConnected ? '✅' : '⚠️' }}</div>
+    <div>
+      <div class="status-title">{{ settings.isConnected ? 'PayPal Connected' : 'PayPal Not Connected' }}</div>
+      <div class="status-sub">{{ settings.isConnected ? 'Your PayPal integration is active and receiving payments' : 'Configure your credentials below to enable PayPal payments' }}</div>
+    </div>
+    <div class="connection-badge" [ngClass]="settings.isConnected ? 'live' : 'sandbox'">
+      {{ settings.mode === 'live' ? 'LIVE' : 'SANDBOX' }}
+    </div>
+  </div>
+
+  <div class="paypal-grid">
+    <!-- Credentials -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">API Credentials</span>
+        <div class="mode-toggle">
+          <button [class.mode-active]="settings.mode === 'sandbox'" (click)="settings.mode = 'sandbox'">Sandbox</button>
+          <button [class.mode-active]="settings.mode === 'live'" (click)="settings.mode = 'live'">Live</button>
+        </div>
+      </div>
+      <div style="padding: 24px;">
+        <div class="env-badge" [ngClass]="settings.mode">
+          {{ settings.mode === 'sandbox' ? '🧪 Test Mode — transactions are not real' : '🟢 Live Mode — real transactions will be processed' }}
+        </div>
+
+        <div class="form-group">
+          <label>Client ID</label>
+          <div class="secret-field">
+            <input class="form-control"
+              [type]="showClientId ? 'text' : 'password'"
+              [(ngModel)]="settings.clientId"
+              placeholder="AxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxB" />
+            <button class="secret-toggle" (click)="showClientId = !showClientId">
+              {{ showClientId ? '🙈' : '👁️' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Client Secret</label>
+          <div class="secret-field">
+            <input class="form-control"
+              [type]="showSecret ? 'text' : 'password'"
+              [(ngModel)]="settings.clientSecret"
+              placeholder="Exxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx1" />
+            <button class="secret-toggle" (click)="showSecret = !showSecret">
+              {{ showSecret ? '🙈' : '👁️' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Webhook URL (read-only)</label>
+          <div class="webhook-field">
+            <input class="form-control" [value]="webhookUrl" readonly />
+            <button class="btn btn-ghost btn-sm" (click)="copyWebhook()">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction Settings -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Transaction Settings</span>
+      </div>
+      <div style="padding: 24px;">
+        <div class="form-group">
+          <label>Currency</label>
+          <select class="form-control" [(ngModel)]="settings.currency">
+            <option value="USD">USD — US Dollar</option>
+            <option value="EUR">EUR — Euro</option>
+            <option value="GBP">GBP — British Pound</option>
+            <option value="CAD">CAD — Canadian Dollar</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Platform Fee (%)</label>
+          <input class="form-control" type="number" [(ngModel)]="settings.platformFee" min="0" max="100" step="0.5" />
+          <small style="color:var(--text-light);font-size:0.78rem;margin-top:5px;display:block">
+            Percentage deducted from each transaction as platform commission
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Return URL (after payment)</label>
+          <input class="form-control" [(ngModel)]="settings.returnUrl" placeholder="https://realtors.com/payment/success" />
+        </div>
+
+        <div class="form-group">
+          <label>Cancel URL</label>
+          <input class="form-control" [(ngModel)]="settings.cancelUrl" placeholder="https://realtors.com/payment/cancel" />
+        </div>
+
+        <div class="toggle-setting" style="margin-top:10px">
+          <div>
+            <div class="toggle-label">Auto-Capture Payments</div>
+            <div class="toggle-desc">Automatically capture authorized payments</div>
+          </div>
+          <button class="toggle" [class.on]="settings.autoCapture" (click)="settings.autoCapture = !settings.autoCapture"></button>
+        </div>
+
+        <div class="toggle-setting">
+          <div>
+            <div class="toggle-label">Email Receipts</div>
+            <div class="toggle-desc">Send PayPal receipts to buyers automatically</div>
+          </div>
+          <button class="toggle" [class.on]="settings.emailReceipts" (click)="settings.emailReceipts = !settings.emailReceipts"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Transactions via PayPal -->
+  <div class="card" style="margin-top:22px">
+    <div class="card-header">
+      <span class="card-title">Recent PayPal Transactions</span>
+      <span class="badge badge-emerald">Via PayPal API</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>PayPal Txn ID</th>
+            <th>Buyer</th>
+            <th>Package</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of recentPayPalTxns">
+            <td style="font-family:monospace;font-size:0.79rem;color:var(--text-light)">{{ t.paypalId }}</td>
+            <td>{{ t.buyer }}</td>
+            <td><span class="badge badge-emerald">{{ t.package }}</span></td>
+            <td style="font-weight:600">${{ t.amount }}</td>
+            <td>
+              <span class="badge" [ngClass]="t.status === 'COMPLETED' ? 'badge-approved' : 'badge-pending'">
+                {{ t.status }}
+              </span>
+            </td>
+            <td style="color:var(--text-light);font-size:0.82rem">{{ t.date | date:'MMM d, y' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container">
+  <div class="toast" [ngClass]="t.type" *ngFor="let t of toasts">
+    {{ t.type === 'success' ? '✅' : '❌' }} {{ t.message }}
+  </div>
+</div>

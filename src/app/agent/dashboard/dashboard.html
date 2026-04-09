@@ -1,0 +1,223 @@
+<div class="page-wrapper space-y-6">
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div>
+      <div class="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">
+        Agent
+      </div>
+      <h1 class="mt-3 text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">My Dashboard</h1>
+      <p class="mt-1 text-sm text-slate-600">Welcome back, {{ agentName }}! Here's your activity overview.</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm">
+        {{ today | date:'EEEE, MMM d, y' }}
+      </span>
+      <button
+        class="inline-flex items-center gap-2 rounded-xl border border-transparent bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+        (click)="openModal()"
+      >
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        Post New Ad
+      </button>
+    </div>
+  </div>
+
+  <div class="loading-overlay" *ngIf="loading">
+    <div class="spinner"></div> Loading dashboard…
+  </div>
+
+  <!-- KPI Stats -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4" *ngIf="!loading">
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="flex items-start justify-between">
+        <div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-emerald-700">🏠</div>
+        <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700" *ngIf="stats.totalListings > 0">↑ Active</span>
+      </div>
+      <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ stats.totalListings }}</div>
+      <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">My Listings</div>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="flex items-start justify-between">
+        <div class="grid h-10 w-10 place-items-center rounded-xl bg-sky-50 text-sky-700">✅</div>
+        <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700">Live</span>
+      </div>
+      <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ stats.approvedListings }}</div>
+      <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Approved</div>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="flex items-start justify-between">
+        <div class="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-amber-700">⏳</div>
+        <span class="inline-flex items-center rounded-full bg-rose-50 px-2.5 py-1 text-[11px] font-bold text-rose-700" *ngIf="stats.pendingListings > 0">Awaiting</span>
+      </div>
+      <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ stats.pendingListings }}</div>
+      <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Pending Review</div>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="flex items-start justify-between">
+        <div class="grid h-10 w-10 place-items-center rounded-xl bg-violet-50 text-violet-700">📦</div>
+        <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700" *ngIf="stats.packageName">Active</span>
+      </div>
+      <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ stats.packageName || '—' }}</div>
+      <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">My Package</div>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="flex items-start justify-between">
+        <div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-emerald-700">📸</div>
+        <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-700">Quota</span>
+      </div>
+      <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ stats.adsRemaining }}</div>
+      <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Ads Remaining</div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="flex items-center justify-between">
+    <div>
+      <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Shortcuts</div>
+      <div class="mt-1 text-lg font-bold text-slate-900">Quick actions</div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <a
+      class="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      routerLink="/agent/my-listings/create"
+    >
+      <div class="grid h-11 w-11 place-items-center rounded-xl bg-emerald-50 text-emerald-700">➕</div>
+      <div class="min-w-0 flex-1">
+        <div class="font-semibold text-slate-900">Post New Ad</div>
+        <div class="text-sm text-slate-600">Create a new listing</div>
+      </div>
+      <svg class="text-slate-300 transition group-hover:text-emerald-600" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    <a
+      class="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      routerLink="/agent/my-listings"
+    >
+      <div class="grid h-11 w-11 place-items-center rounded-xl bg-amber-50 text-amber-700">📋</div>
+      <div class="min-w-0 flex-1">
+        <div class="font-semibold text-slate-900">My Listings</div>
+        <div class="text-sm text-slate-600">{{ stats.totalListings }} total ads</div>
+      </div>
+      <svg class="text-slate-300 transition group-hover:text-emerald-600" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    <a
+      class="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      routerLink="/agent/packages/plans"
+    >
+      <div class="grid h-11 w-11 place-items-center rounded-xl bg-sky-50 text-sky-700">📦</div>
+      <div class="min-w-0 flex-1">
+        <div class="font-semibold text-slate-900">Upgrade Package</div>
+        <div class="text-sm text-slate-600">View available plans</div>
+      </div>
+      <svg class="text-slate-300 transition group-hover:text-emerald-600" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+    <a
+      class="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      routerLink="/agent/profile"
+    >
+      <div class="grid h-11 w-11 place-items-center rounded-xl bg-violet-50 text-violet-700">👤</div>
+      <div class="min-w-0 flex-1">
+        <div class="font-semibold text-slate-900">My Profile</div>
+        <div class="text-sm text-slate-600">Manage account settings</div>
+      </div>
+      <svg class="text-slate-300 transition group-hover:text-emerald-600" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+  </div>
+
+  <!-- Recent Listings -->
+  <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+      <span class="text-base font-bold text-slate-900">My Recent Listings</span>
+      <a routerLink="/agent/my-listings" class="text-sm font-semibold text-emerald-600 hover:text-emerald-700">View All</a>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-slate-100 bg-slate-50/80">
+            <th class="text-left font-semibold text-slate-600 px-5 py-3">Title</th>
+            <th class="text-left font-semibold text-slate-600 px-5 py-3">Category</th>
+            <th class="text-left font-semibold text-slate-600 px-5 py-3">Price</th>
+            <th class="text-left font-semibold text-slate-600 px-5 py-3">Status</th>
+            <th class="text-left font-semibold text-slate-600 px-5 py-3">Date</th>
+            <th class="text-left font-semibold text-slate-600 px-5 py-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let l of recentListings" class="border-b border-slate-100 hover:bg-slate-50/50">
+            <td class="px-5 py-3 font-medium text-slate-900">{{ l.title }}</td>
+            <td class="px-5 py-3"><span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">{{ l.categoryName || l.category?.name || l.category || '—' }}</span></td>
+            <td class="px-5 py-3 font-semibold text-slate-900">${{ l.price | number }}</td>
+            <td class="px-5 py-3">
+              <span
+                class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                [ngClass]="{
+                  'bg-emerald-50 text-emerald-700': l.status === 'Approved',
+                  'bg-amber-50 text-amber-700': l.status === 'Pending',
+                  'bg-rose-50 text-rose-700': l.status === 'Rejected'
+                }"
+              >{{ l.status }}</span>
+            </td>
+            <td class="px-5 py-3 text-slate-600">{{ l.createdDate | date:'MMM d' }}</td>
+            <td class="px-5 py-3"><a routerLink="/agent/my-listings" class="text-emerald-600 font-medium hover:text-emerald-700">View</a></td>
+          </tr>
+          <tr *ngIf="recentListings.length === 0">
+            <td colspan="6" class="px-5 py-12 text-center">
+              <div class="text-slate-500">
+                <div class="text-3xl mb-2">🏠</div>
+                <h3 class="font-semibold text-slate-700">No listings yet</h3>
+                <p class="text-sm mt-1">Post your first ad to get started.</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Inline Create Listing Panel -->
+<div
+  class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm mt-6"
+  *ngIf="showModal"
+>
+  <div class="flex items-start justify-between mb-4 border-b border-slate-100 pb-4">
+    <div class="flex items-start gap-3">
+      <div class="grid h-11 w-11 place-items-center rounded-xl bg-emerald-50 text-emerald-700 text-xl shrink-0">🏠</div>
+      <div>
+        <h2 class="text-xl font-semibold text-slate-900 leading-tight">Create New Property</h2>
+        <p class="text-sm text-slate-500 mt-1">Quickly post a new listing without leaving your dashboard.</p>
+      </div>
+    </div>
+    <button type="button" class="text-slate-400 hover:text-slate-600 transition-colors" (click)="closeModal()" aria-label="Close create listing panel">
+      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <form (ngSubmit)="submitListing(listingForm)" #listingForm="ngForm" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="md:col-span-2 space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Title <span class="text-rose-500">*</span></label>
+        <input type="text" name="title" ngModel required class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500" placeholder="e.g. 3 Bedroom Apartment in DHA" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Price <span class="text-rose-500">*</span></label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-sm">$</span>
+          <input type="number" name="price" ngModel required class="w-full pl-8 rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500" placeholder="120000" />
+        </div>
+      </div>
+    </div>
+    <div class="md:col-span-1 flex flex-col justify-between space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Category <span class="text-rose-500">*</span></label>
+        <input type="text" name="category" ngModel required class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500" placeholder="e.g. Residential" />
+      </div>
+      <div class="flex justify-end gap-3 pt-2 md:pt-6 border-t md:border-t-0 md:border-none border-slate-100">
+        <button type="button" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50" (click)="closeModal()">Cancel</button>
+        <button type="submit" class="rounded-xl border border-transparent bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700">Create Listing</button>
+      </div>
+    </div>
+  </form>
+</div>

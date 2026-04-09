@@ -1,0 +1,131 @@
+<div class="page-wrapper">
+  <div class="accent-bar"></div>
+
+  <div class="page-header">
+    <div class="page-title-block">
+      <h1>Sellers</h1>
+      <p>Manage property sellers and their listings</p>
+    </div>
+    <div class="toolbar">
+      <div class="search-box">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" placeholder="Search sellers…" [(ngModel)]="searchTerm" (input)="onSearch()" />
+      </div>
+      <select class="form-control" style="width:auto;padding:8px 12px;font-size:0.875rem" [(ngModel)]="statusFilter" (change)="onSearch()">
+        <option value="">All Status</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">🏡</div>
+      <div class="stat-value">{{ sellers.length }}</div>
+      <div class="stat-label">Total Sellers</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-value">{{ activeCount }}</div>
+      <div class="stat-label">Active Sellers</div>
+      <div class="stat-badge up">↑ 5%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📄</div>
+      <div class="stat-value">{{ totalListings }}</div>
+      <div class="stat-label">Total Listings</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💵</div>
+      <div class="stat-value">${{ avgListingValue | number:'1.0-0' }}</div>
+      <div class="stat-label">Avg. Listing Value</div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Seller Registry</span>
+      <span style="font-size:0.82rem;color:var(--text-light)">{{ filteredSellers.length }} sellers</span>
+    </div>
+
+    <div *ngIf="loading" class="loading-overlay">
+      <div class="spinner"></div> Loading sellers…
+    </div>
+
+    <div class="table-wrap" *ngIf="!loading">
+      <table>
+        <thead>
+          <tr>
+            <th>Seller</th>
+            <th>Phone</th>
+            <th>Listings</th>
+            <th>Approved</th>
+            <th>Pending</th>
+            <th>Avg. Value</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of paginatedSellers">
+            <td>
+              <div class="user-cell">
+                <div class="avatar">{{ getInitials(s.fullName) }}</div>
+                <div class="user-info">
+                  <div class="name">{{ s.fullName }}</div>
+                  <div class="email">{{ s.email }}</div>
+                </div>
+              </div>
+            </td>
+            <td style="color:var(--text-light);font-size:0.85rem">{{ s.phone }}</td>
+            <td><strong>{{ s.totalListings }}</strong></td>
+            <td><span class="badge badge-approved">{{ s.approvedListings }}</span></td>
+            <td><span class="badge badge-pending">{{ s.pendingListings }}</span></td>
+            <td style="font-weight:500">${{ s.avgListingValue | number:'1.0-0' }}</td>
+            <td>
+              <span class="badge" [ngClass]="s.isActive ? 'badge-active' : 'badge-inactive'">
+                {{ s.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-xs btn-outline" (click)="viewListings(s)">Listings</button>
+                <button class="btn btn-xs btn-ghost" (click)="toggleSeller(s)">
+                  {{ s.isActive ? 'Suspend' : 'Restore' }}
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filteredSellers.length === 0">
+            <td colspan="8">
+              <div class="empty-state">
+                <div class="empty-icon">🏡</div>
+                <h3>No sellers found</h3>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" *ngIf="!loading">
+      <span>Showing {{ pageStart }}–{{ pageEnd }} of {{ filteredSellers.length }}</span>
+      <div class="pagination-controls">
+        <button class="page-btn" [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">‹</button>
+        <button class="page-btn" *ngFor="let p of pageNumbers" [class.active]="p === currentPage" (click)="setPage(p)">{{ p }}</button>
+        <button class="page-btn" [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container">
+  <div class="toast" [ngClass]="t.type" *ngFor="let t of toasts">
+    {{ t.type === 'success' ? '✅' : '❌' }} {{ t.message }}
+  </div>
+</div>

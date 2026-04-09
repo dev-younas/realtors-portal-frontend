@@ -1,0 +1,284 @@
+<div class="page-wrapper space-y-6">
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div>
+      <div class="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">
+        Listings
+      </div>
+      <h1 class="mt-3 text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">All Listings</h1>
+      <p class="mt-1 text-sm text-slate-600">Review and manage property listings</p>
+    </div>
+    <div class="toolbar flex items-center gap-3 flex-wrap">
+      <div class="search-box flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
+        <svg class="text-slate-400" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg>
+        <input
+          class="bg-transparent outline-none text-sm placeholder:text-slate-400"
+          type="text"
+          placeholder="Search listings…"
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()"
+        />
+      </div>
+
+      <select
+        class="form-control !w-auto rounded-xl bg-white px-3 py-2 text-sm shadow-sm"
+        [(ngModel)]="statusFilter"
+        (change)="onSearch()"
+      >
+        <option value="">All Status</option>
+        <option value="Approved">Approved</option>
+        <option value="Pending">Pending</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-emerald-700">🏠</div>
+      <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ listings.length }}</div>
+      <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Total Listings</div>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-emerald-700">✅</div>
+      <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ approvedCount }}</div>
+      <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Approved</div>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="flex items-start justify-between">
+        <div class="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-amber-700">⏳</div>
+        <span class="inline-flex items-center rounded-full bg-rose-50 px-2.5 py-1 text-[11px] font-bold text-rose-700" *ngIf="pendingCount > 0">
+          Needs action
+        </span>
+      </div>
+      <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ pendingCount }}</div>
+      <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Pending</div>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="grid h-10 w-10 place-items-center rounded-xl bg-rose-50 text-rose-700">❌</div>
+      <div class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">{{ rejectedCount }}</div>
+      <div class="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Rejected</div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="card-header">
+      <span class="card-title">Listings</span>
+      <span class="text-sm font-medium text-slate-500">{{ filtered.length }} results</span>
+    </div>
+
+    <div class="loading-overlay" *ngIf="loading">
+      <div class="spinner"></div> Loading…
+    </div>
+
+    <div class="table-wrap" *ngIf="!loading">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Agent</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let l of paginated">
+            <td class="font-semibold text-slate-900 max-w-[220px] truncate">{{ l.title }}</td>
+            <td><span class="badge badge-emerald">{{ l.category }}</span></td>
+            <td class="text-sm text-slate-600">{{ l.ownerName }}</td> <!-- ✅ fix -->
+            <td class="font-semibold text-slate-900">${{ l.price | number }}</td>
+            <td>
+              <span class="badge" [ngClass]="{
+                  'badge-approved': l.status === 'Approved',
+                  'badge-pending':  l.status === 'Pending',
+                  'badge-rejected': l.status === 'Rejected'
+                }">{{ l.status }}</span>
+            </td>
+            <td class="text-sm text-slate-500">{{ l.createdDate | date:'MMM d, y' }}</td>
+            <td>
+              <div class="flex gap-2 flex-wrap">
+                <button
+                  class="btn btn-xs inline-flex items-center rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 border border-emerald-100 hover:bg-emerald-100"
+                  style="border:none"
+                  *ngIf="l.status === 'Pending'"
+                  (click)="approve(l)"
+                >
+                  Approve
+                </button>
+                <button class="btn btn-xs btn-danger" *ngIf="l.status === 'Pending'" (click)="reject(l)">Reject</button>
+                <button class="btn btn-xs btn-ghost" (click)="viewDetail(l)">View</button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filtered.length === 0">
+            <td colspan="7">
+              <div class="empty-state">
+                <div class="empty-icon">🏠</div>
+                <h3>No listings found</h3>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="!loading && filtered.length > 0">
+      <span>Showing {{ pageStart }}–{{ pageEnd }} of {{ filtered.length }}</span>
+      <div class="pagination-controls">
+        <button class="page-btn" [disabled]="page===1" (click)="setPage(page-1)">‹</button>
+        <button class="page-btn" *ngFor="let p of pages" [class.active]="p===page" (click)="setPage(p)">{{ p }}</button>
+        <button class="page-btn" [disabled]="page===totalPages" (click)="setPage(page+1)">›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     INLINE LISTING DETAIL VIEW
+     ============================================================ -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6 mb-6" *ngIf="showModal && selectedListing">
+  <!-- Header -->
+  <div class="flex items-start justify-between mb-6 pb-4 border-b border-gray-100">
+    <div class="flex items-start gap-4">
+      <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-50 text-blue-600 text-2xl shrink-0">
+        🏠
+      </div>
+      <div>
+        <h2 class="text-xl font-bold text-gray-800 leading-tight">{{ selectedListing.title }}</h2>
+        <p class="text-sm text-gray-500 mt-1">
+          Listed by <span class="font-medium text-gray-700">{{ selectedListing.ownerName }}</span>
+        </p>
+      </div>
+    </div>
+    <button class="text-gray-400 hover:text-gray-600 transition-colors p-1" (click)="closeModal()"
+      aria-label="Close details">
+      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+    <!-- Left Column: Images -->
+    <div class="lg:col-span-3 space-y-4">
+      <!-- Image Gallery -->
+      <div class="rounded-xl overflow-hidden bg-gray-50 border border-gray-200"
+        *ngIf="selectedListing.images && selectedListing.images.length > 0">
+        <div class="aspect-video w-full relative group">
+          <img [src]="activeImage" alt="Listing image" class="w-full h-full object-cover" />
+        </div>
+        <!-- Thumbnails -->
+        <div class="flex gap-2 p-3 overflow-x-auto bg-white border-t border-gray-200 hide-scrollbar"
+          *ngIf="selectedListing.images.length > 1">
+          <button *ngFor="let img of selectedListing.images"
+            class="relative w-20 h-14 rounded-md overflow-hidden shrink-0 border-2 transition-all focus:outline-none"
+            [class.border-emerald-500]="img === activeImage" [class.border-transparent]="img !== activeImage"
+            [class.opacity-100]="img === activeImage" [class.opacity-60]="img !== activeImage"
+            [class.hover:opacity-100]="img !== activeImage" (click)="setActiveImage(img)">
+            <img [src]="img" class="w-full h-full object-cover" alt="thumb" />
+          </button>
+        </div>
+      </div>
+
+      <!-- No images fallback -->
+      <div
+        class="flex flex-col items-center justify-center py-12 px-4 rounded-xl bg-gray-50 border border-dashed border-gray-300"
+        *ngIf="!selectedListing.images || selectedListing.images.length === 0">
+        <span class="text-4xl mb-3 opacity-50">🖼️</span>
+        <p class="text-gray-500 font-medium text-sm">No images uploaded</p>
+      </div>
+    </div>
+
+    <!-- Right Column: Details -->
+    <div class="lg:col-span-2 space-y-6">
+      <!-- Key Stats Grid -->
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Price -->
+        <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+          <span class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Price</span>
+          <span class="block text-2xl font-bold text-gray-900">${{ selectedListing.price | number }}</span>
+        </div>
+        <!-- Status -->
+        <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+          <span class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Status</span>
+          <div class="mt-1">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" [ngClass]="{
+                'bg-emerald-100 text-emerald-800': selectedListing.status === 'Approved',
+                'bg-amber-100 text-amber-800': selectedListing.status === 'Pending',
+                'bg-rose-100 text-rose-800': selectedListing.status === 'Rejected'
+              }">
+              {{ selectedListing.status }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detail List -->
+      <div class="bg-white rounded-lg border border-gray-200 overflow-hidden divide-y divide-gray-100 text-sm">
+        <div class="flex justify-between py-3 px-4">
+          <span class="font-medium text-gray-500">Category</span>
+          <span class="font-semibold text-gray-800">{{ selectedListing.category }}</span>
+        </div>
+        <div class="flex justify-between py-3 px-4">
+          <span class="font-medium text-gray-500">Listed On</span>
+          <span class="text-gray-800">{{ selectedListing.createdDate | date:'MMM d, y' }}</span>
+        </div>
+        <div class="flex justify-between py-3 px-4">
+          <span class="font-medium text-gray-500">Expires On</span>
+          <span class="text-gray-800">{{ selectedListing.expiryDate | date:'MMM d, y' }}</span>
+        </div>
+        <div class="flex flex-col py-3 px-4 gap-1">
+          <span class="font-medium text-gray-500">Agent Email</span>
+          <a [href]="'mailto:' + selectedListing.ownerEmail" class="text-blue-600 hover:underline truncate">{{
+            selectedListing.ownerEmail }}</a>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <h3 class="text-sm font-semibold text-gray-800 mb-2">Description</h3>
+        <div
+          class="p-4 bg-gray-50 rounded-lg border border-gray-100 text-sm text-gray-600 leading-relaxed max-h-48 overflow-y-auto">
+          {{ selectedListing.description || 'No description provided.' }}
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="pt-4 border-t border-gray-100 flex flex-col sm:flex-row gap-3">
+        <ng-container *ngIf="selectedListing.status === 'Pending'">
+          <button
+            class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
+            (click)="approve(selectedListing)">
+            ✅ Approve
+          </button>
+          <button
+            class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 transition-colors"
+            (click)="reject(selectedListing)">
+            ❌ Reject
+          </button>
+        </ng-container>
+        <div *ngIf="selectedListing.status !== 'Pending'"
+          class="w-full text-center py-2 px-3 bg-gray-50 rounded-md border border-gray-100">
+          <p class="text-sm text-gray-500 italic">
+            This listing is already <span class="font-semibold lowercase">{{ selectedListing.status }}</span>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container">
+  <div class="toast" [ngClass]="t.type" *ngFor="let t of toasts">
+    {{ t.type === 'success' ? '✅' : '❌' }} {{ t.message }}
+  </div>
+</div>

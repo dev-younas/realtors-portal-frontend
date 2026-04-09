@@ -1,0 +1,132 @@
+<div class="panel-wrapper min-h-screen flex bg-slate-50 text-slate-900">
+
+  <!-- SIDEBAR -->
+  <aside
+    class="sidebar relative shrink-0 overflow-hidden border-r border-white/10 bg-slate-950 text-slate-200"
+    [class.collapsed]="isCollapsed"
+  >
+    <div class="pointer-events-none absolute inset-x-0 top-0 h-56 bg-[radial-gradient(ellipse_at_top_left,rgba(16,185,129,0.25),transparent_60%)]"></div>
+
+    <div class="logo-section relative flex items-center gap-3 px-5 py-5">
+      <div class="logo grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-700 text-sm font-black text-white shadow-[0_10px_30px_rgba(16,185,129,0.25)]">
+        RP
+      </div>
+      <div class="min-w-0" *ngIf="!isCollapsed">
+        <div class="truncate text-sm font-extrabold tracking-tight text-white">Realtors Portal</div>
+        <div class="truncate text-xs text-emerald-200/70">Control center</div>
+      </div>
+    </div>
+
+    <nav class="relative px-3 pb-6">
+      <ul class="menu flex flex-col gap-1 overflow-y-auto pr-1">
+        <li *ngFor="let item of menuItems">
+
+          <!-- Single Route -->
+          <a
+            *ngIf="!item.children"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            class="menu-link group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition"
+          >
+            <i class="bi text-base opacity-90" [ngClass]="item.icon"></i>
+            <span class="min-w-0 flex-1 truncate" *ngIf="!isCollapsed">{{ item.label }}</span>
+          </a>
+
+          <!-- Parent Menu -->
+          <div *ngIf="item.children" class="menu-parent">
+            <button
+              type="button"
+              class="menu-link parent group flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition"
+              (click)="item.open = !item.open"
+            >
+              <span class="flex min-w-0 items-center gap-3">
+                <i class="bi text-base opacity-90" [ngClass]="item.icon"></i>
+                <span class="min-w-0 flex-1 truncate" *ngIf="!isCollapsed">{{ item.label }}</span>
+              </span>
+              <i
+                *ngIf="!isCollapsed"
+                class="bi text-xs opacity-70 transition-transform"
+                [ngClass]="item.open ? 'bi-chevron-up' : 'bi-chevron-down'"
+              ></i>
+            </button>
+
+            <ul class="submenu mt-1 space-y-1 pl-3" *ngIf="item.open && !isCollapsed">
+              <li *ngFor="let child of item.children">
+                <a
+                  [routerLink]="child.route"
+                  routerLinkActive="active"
+                  class="submenu-link group flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition"
+                >
+                  <i class="bi text-[11px] opacity-80" [ngClass]="child.icon || 'bi-circle'"></i>
+                  <span class="min-w-0 flex-1 truncate">{{ child.label }}</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main-section flex min-w-0 flex-1 flex-col">
+    <header class="topbar sticky top-0 z-40 flex items-center gap-4 border-b border-slate-200 bg-white/75 px-4 py-3 backdrop-blur-lg md:px-6">
+      <div class="left-section flex items-center gap-3">
+        <button
+          type="button"
+          class="collapse-btn inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+          (click)="isCollapsed = !isCollapsed"
+          aria-label="Toggle sidebar"
+        >
+          <i class="bi bi-list text-lg"></i>
+        </button>
+
+        <div class="breadcrumb hidden sm:block">
+          <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Panel</div>
+          <div class="text-sm font-semibold text-slate-900">Admin</div>
+        </div>
+      </div>
+
+      <div class="right-section ml-auto flex items-center gap-3">
+        <div class="search-box hidden items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-700 shadow-sm focus-within:ring-2 focus-within:ring-emerald-500/30 md:flex">
+          <i class="bi bi-search text-sm text-slate-400"></i>
+          <input class="w-56 bg-transparent text-sm outline-none placeholder:text-slate-400" type="text" placeholder="Search..." />
+        </div>
+
+        <a
+          class="user-info group flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition hover:bg-slate-50"
+          [routerLink]="profileRoute"
+        >
+          <div class="avatar grid h-9 w-9 place-items-center rounded-full bg-emerald-600 text-sm font-bold text-white">
+            {{ userEmail.charAt(0).toUpperCase() }}
+          </div>
+          <div class="user-text hidden max-w-[220px] min-w-0 sm:block">
+            <div class="email truncate text-sm font-semibold text-slate-900">{{ userEmail }}</div>
+            <div class="text-xs text-slate-500">Administrator</div>
+          </div>
+        </a>
+
+        <button
+          type="button"
+          class="logout-btn inline-flex h-10 items-center justify-center rounded-xl bg-emerald-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+          (click)="logout()"
+        >
+          <i class="bi bi-box-arrow-right text-base"></i>
+          <span class="ml-2 hidden sm:inline">Logout</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <main class="content flex-1 overflow-y-auto bg-slate-50 px-4 py-6 md:px-6">
+      <div class="mx-auto w-full max-w-7xl">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="panel-footer border-t border-slate-200 bg-white px-4 py-4 text-center text-sm text-slate-500 md:px-6">
+      © 2026 Realtors Portal | All rights reserved
+    </footer>
+  </div>
+</div>

@@ -1,0 +1,137 @@
+<div class="page-wrapper">
+  <div class="accent-bar"></div>
+
+  <div class="page-header">
+    <div class="page-title-block">
+      <h1>Transactions</h1>
+      <p>Monitor subscription purchases and payment history</p>
+    </div>
+    <div class="toolbar">
+      <div class="search-box">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" placeholder="Search transactions…" [(ngModel)]="searchTerm" (input)="onSearch()" />
+      </div>
+      <select class="form-control" style="width:auto;padding:8px 12px;font-size:0.875rem" [(ngModel)]="statusFilter" (change)="onSearch()">
+        <option value="">All Status</option>
+        <option value="completed">Completed</option>
+        <option value="pending">Pending</option>
+        <option value="failed">Failed</option>
+        <option value="refunded">Refunded</option>
+      </select>
+      <button class="btn btn-ghost" (click)="exportCSV()">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+        </svg>
+        Export
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">💳</div>
+      <div class="stat-value">{{ transactions.length }}</div>
+      <div class="stat-label">Total Transactions</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-value">${{ totalRevenue | number:'1.0-0' }}</div>
+      <div class="stat-label">Total Revenue</div>
+      <div class="stat-badge up">↑ 15%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-value">{{ completedCount }}</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">↩️</div>
+      <div class="stat-value">{{ refundedCount }}</div>
+      <div class="stat-label">Refunded</div>
+      <div class="stat-badge down" *ngIf="refundedCount > 0">↑ {{ refundedCount }}</div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Transaction Ledger</span>
+      <span style="font-size:0.82rem;color:var(--text-light)">{{ filteredTxns.length }} records</span>
+    </div>
+
+    <div *ngIf="loading" class="loading-overlay">
+      <div class="spinner"></div> Loading transactions…
+    </div>
+
+    <div class="table-wrap" *ngIf="!loading">
+      <table>
+        <thead>
+          <tr>
+            <th>Txn ID</th>
+            <th>Buyer</th>
+            <th>Package</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let txn of paginatedTxns">
+            <td style="font-family:monospace;font-size:0.8rem;color:var(--text-light)">#{{ txn.id }}</td>
+            <td>
+              <div class="user-cell">
+                <div class="avatar">{{ getInitials(txn.buyerName) }}</div>
+                <div class="user-info">
+                  <div class="name">{{ txn.buyerName }}</div>
+                  <div class="email">{{ txn.buyerEmail }}</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge badge-emerald">{{ txn.packageName }}</span></td>
+            <td style="font-weight:600;color:var(--forest-night)">${{ txn.amount | number:'1.2-2' }}</td>
+            <td style="font-size:0.85rem">{{ txn.paymentMethod }}</td>
+            <td>
+              <span class="badge"
+                [ngClass]="{
+                  'badge-approved': txn.status === 'completed',
+                  'badge-pending': txn.status === 'pending',
+                  'badge-rejected': txn.status === 'failed',
+                  'badge-inactive': txn.status === 'refunded'
+                }">
+                {{ txn.status | titlecase }}
+              </span>
+            </td>
+            <td style="color:var(--text-light);font-size:0.82rem">{{ txn.date | date:'MMM d, y, h:mm a' }}</td>
+          </tr>
+          <tr *ngIf="filteredTxns.length === 0">
+            <td colspan="7">
+              <div class="empty-state">
+                <div class="empty-icon">💳</div>
+                <h3>No transactions found</h3>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" *ngIf="!loading">
+      <span>Showing {{ pageStart }}–{{ pageEnd }} of {{ filteredTxns.length }}</span>
+      <div class="pagination-controls">
+        <button class="page-btn" [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">‹</button>
+        <button class="page-btn" *ngFor="let p of pageNumbers" [class.active]="p === currentPage" (click)="setPage(p)">{{ p }}</button>
+        <button class="page-btn" [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container">
+  <div class="toast" [ngClass]="t.type" *ngFor="let t of toasts">
+    {{ t.type === 'success' ? '✅' : '❌' }} {{ t.message }}
+  </div>
+</div>

@@ -1,0 +1,197 @@
+<div class="page-wrapper">
+  <div class="accent-bar"></div>
+
+  <div class="page-header">
+    <div class="page-title-block">
+      <h1>General Settings</h1>
+      <p>Configure portal-wide settings and preferences</p>
+    </div>
+    <div class="toolbar">
+      <button class="btn btn-ghost" (click)="resetChanges()">Reset</button>
+      <button class="btn btn-primary" (click)="saveSettings()" [disabled]="saving">
+        <div class="spinner" *ngIf="saving" style="width:16px;height:16px;border-width:2px"></div>
+        Save Changes
+      </button>
+    </div>
+  </div>
+
+  <div class="settings-layout">
+    <!-- Left Nav -->
+    <div class="settings-nav">
+      <button class="snav-item" [class.active]="activeSection === 'portal'" (click)="activeSection = 'portal'">
+        <span>🏢</span> Portal Info
+      </button>
+      <button class="snav-item" [class.active]="activeSection === 'listings'" (click)="activeSection = 'listings'">
+        <span>🏠</span> Listing Rules
+      </button>
+      <button class="snav-item" [class.active]="activeSection === 'notifications'" (click)="activeSection = 'notifications'">
+        <span>🔔</span> Notifications
+      </button>
+      <button class="snav-item" [class.active]="activeSection === 'security'" (click)="activeSection = 'security'">
+        <span>🔒</span> Security
+      </button>
+    </div>
+
+    <!-- Settings Panels -->
+    <div class="settings-content">
+
+      <!-- Portal Info -->
+      <div class="settings-panel" *ngIf="activeSection === 'portal'">
+        <div class="panel-title">Portal Information</div>
+
+        <div class="form-group">
+          <label>Portal Name</label>
+          <input class="form-control" [(ngModel)]="settings.portalName" placeholder="RealtorsPortal" />
+        </div>
+        <div class="form-group">
+          <label>Support Email</label>
+          <input class="form-control" type="email" [(ngModel)]="settings.supportEmail" placeholder="support@realtors.com" />
+        </div>
+        <div class="form-group">
+          <label>Portal URL</label>
+          <input class="form-control" [(ngModel)]="settings.portalUrl" placeholder="https://realtors.com" />
+        </div>
+        <div class="form-group">
+          <label>Contact Phone</label>
+          <input class="form-control" [(ngModel)]="settings.phone" placeholder="+1 800-REALTORS" />
+        </div>
+        <div class="form-group">
+          <label>Default Language</label>
+          <select class="form-control" [(ngModel)]="settings.language">
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="ar">Arabic</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Default Currency</label>
+          <select class="form-control" [(ngModel)]="settings.currency">
+            <option value="USD">USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Listing Rules -->
+      <div class="settings-panel" *ngIf="activeSection === 'listings'">
+        <div class="panel-title">Listing Rules</div>
+
+        <div class="toggle-setting">
+          <div>
+            <div class="toggle-label">Require Listing Approval</div>
+            <div class="toggle-desc">All new listings must be reviewed by an admin before going live</div>
+          </div>
+          <button class="toggle" [class.on]="settings.requireApproval" (click)="settings.requireApproval = !settings.requireApproval"></button>
+        </div>
+
+        <div class="toggle-setting">
+          <div>
+            <div class="toggle-label">Allow Image Uploads</div>
+            <div class="toggle-desc">Agents can upload photos to their listings</div>
+          </div>
+          <button class="toggle" [class.on]="settings.allowImages" (click)="settings.allowImages = !settings.allowImages"></button>
+        </div>
+
+        <div class="toggle-setting">
+          <div>
+            <div class="toggle-label">Featured Listings</div>
+            <div class="toggle-desc">Enable premium featured listing placements</div>
+          </div>
+          <button class="toggle" [class.on]="settings.featuredListings" (click)="settings.featuredListings = !settings.featuredListings"></button>
+        </div>
+
+        <div class="form-group" style="margin-top:18px">
+          <label>Max Images per Listing</label>
+          <input class="form-control" type="number" [(ngModel)]="settings.maxImages" placeholder="10" style="width:120px" />
+        </div>
+
+        <div class="form-group">
+          <label>Max File Size (MB)</label>
+          <input class="form-control" type="number" [(ngModel)]="settings.maxFileSizeMB" placeholder="5" style="width:120px" />
+        </div>
+
+        <div class="form-group">
+          <label>Auto-Expire Listings After (Days)</label>
+          <input class="form-control" type="number" [(ngModel)]="settings.expireDays" placeholder="90" style="width:120px" />
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="settings-panel" *ngIf="activeSection === 'notifications'">
+        <div class="panel-title">Notification Settings</div>
+
+        <div class="toggle-setting">
+          <div>
+            <div class="toggle-label">Email Notifications</div>
+            <div class="toggle-desc">Send email alerts for new registrations and listings</div>
+          </div>
+          <button class="toggle" [class.on]="settings.emailNotifs" (click)="settings.emailNotifs = !settings.emailNotifs"></button>
+        </div>
+
+        <div class="toggle-setting">
+          <div>
+            <div class="toggle-label">New Agent Alerts</div>
+            <div class="toggle-desc">Notify admins when a new agent registers</div>
+          </div>
+          <button class="toggle" [class.on]="settings.agentAlerts" (click)="settings.agentAlerts = !settings.agentAlerts"></button>
+        </div>
+
+        <div class="toggle-setting">
+          <div>
+            <div class="toggle-label">Listing Pending Alerts</div>
+            <div class="toggle-desc">Notify admins when a listing awaits approval</div>
+          </div>
+          <button class="toggle" [class.on]="settings.listingAlerts" (click)="settings.listingAlerts = !settings.listingAlerts"></button>
+        </div>
+
+        <div class="toggle-setting">
+          <div>
+            <div class="toggle-label">Transaction Alerts</div>
+            <div class="toggle-desc">Notify on new subscription purchases</div>
+          </div>
+          <button class="toggle" [class.on]="settings.txnAlerts" (click)="settings.txnAlerts = !settings.txnAlerts"></button>
+        </div>
+      </div>
+
+      <!-- Security -->
+      <div class="settings-panel" *ngIf="activeSection === 'security'">
+        <div class="panel-title">Security Settings</div>
+
+        <div class="toggle-setting">
+          <div>
+            <div class="toggle-label">Two-Factor Authentication</div>
+            <div class="toggle-desc">Require 2FA for all admin accounts</div>
+          </div>
+          <button class="toggle" [class.on]="settings.twoFactor" (click)="settings.twoFactor = !settings.twoFactor"></button>
+        </div>
+
+        <div class="toggle-setting">
+          <div>
+            <div class="toggle-label">Session Timeout</div>
+            <div class="toggle-desc">Automatically log out after inactivity</div>
+          </div>
+          <button class="toggle" [class.on]="settings.sessionTimeout" (click)="settings.sessionTimeout = !settings.sessionTimeout"></button>
+        </div>
+
+        <div class="form-group" style="margin-top:18px">
+          <label>Session Timeout (minutes)</label>
+          <input class="form-control" type="number" [(ngModel)]="settings.timeoutMinutes" placeholder="30" style="width:120px" [disabled]="!settings.sessionTimeout" />
+        </div>
+
+        <div class="form-group">
+          <label>Max Login Attempts</label>
+          <input class="form-control" type="number" [(ngModel)]="settings.maxLoginAttempts" placeholder="5" style="width:120px" />
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast-container">
+  <div class="toast" [ngClass]="t.type" *ngFor="let t of toasts">
+    {{ t.type === 'success' ? '✅' : '❌' }} {{ t.message }}
+  </div>
+</div>

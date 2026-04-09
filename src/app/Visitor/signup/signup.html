@@ -1,0 +1,206 @@
+<!-- Animated Background -->
+<div class="auth-background">
+  <div class="gradient-orb orb-1"></div>
+  <div class="gradient-orb orb-2"></div>
+  <div class="gradient-orb orb-3"></div>
+</div>
+
+<!-- Main Container -->
+<div class="auth-container">
+  <!-- Left Side - Image/Branding -->
+  <div class="auth-left">
+    <div class="branding">
+      <div class="logo">
+        <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+          <path d="M30 8L52 22V52H38V38H22V52H8V22L30 8Z" fill="white" />
+        </svg>
+      </div>
+      <h1>Realtors Portal</h1>
+      <p class="tagline">Join thousands of satisfied users</p>
+    </div>
+
+    <div class="features">
+      <div class="feature-item" data-animate style="animation-delay: 0.2s">
+        <div class="feature-icon">✨</div>
+        <div class="feature-content">
+          <h3>Easy Setup</h3>
+          <p>Get started in minutes</p>
+        </div>
+      </div>
+      <div class="feature-item" data-animate style="animation-delay: 0.4s">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-content">
+          <h3>Secure Platform</h3>
+          <p>Your data is safe with us</p>
+        </div>
+      </div>
+      <div class="feature-item" data-animate style="animation-delay: 0.6s">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-content">
+          <h3>Fast Results</h3>
+          <p>Find properties quickly</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-row" data-animate style="animation-delay: 0.8s">
+      <div class="stat-item">
+        <h3>2,500+</h3>
+        <p>Properties</p>
+      </div>
+      <div class="stat-item">
+        <h3>850+</h3>
+        <p>Happy Clients</p>
+      </div>
+      <div class="stat-item">
+        <h3>95%</h3>
+        <p>Success Rate</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side - Signup Form -->
+  <div class="auth-right" style="margin-top: 100px">
+    <div class="auth-form-container">
+      <div class="form-header">
+        <h2>Create Account</h2>
+        <p>Join Realtors Portal today</p>
+      </div>
+
+      <!-- ✅ Success Message -->
+      <div class="alert alert-success" *ngIf="successMessage">
+        ✅ {{ successMessage }}
+      </div>
+
+      <!-- ❌ Error Message -->
+      <div class="alert alert-error" *ngIf="errorMessage">
+        ❌ {{ errorMessage }}
+      </div>
+
+      <form class="auth-form" [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+
+        <!-- User Type Selection -->
+        <div class="user-type-selector">
+          <label class="user-type-option">
+            <input type="radio" name="userType" value="PrivateSeller" formControlName="userType" />
+            <div class="type-card">
+              <div class="type-icon">👤</div>
+              <span>Private Seller</span>
+            </div>
+          </label>
+          <label class="user-type-option">
+            <input type="radio" name="userType" formControlName="userType" value="Agent" />
+            <div class="type-card">
+              <div class="type-icon">💼</div>
+              <span>Agent</span>
+            </div>
+          </label>
+          <!-- <label class="user-type-option">
+            <input type="radio" name="userType" formControlName="userType" value="Admin" />
+            <div class="type-card">
+              <div class="type-icon">🔑</div>
+              <span>Admin</span>
+            </div>
+          </label> -->
+        </div>
+
+        <!-- Full Name -->
+        <div class="form-group">
+          <label for="fullName">Full Name</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="6" r="4" stroke="currentColor" stroke-width="2" />
+              <path d="M3 18C3 14.6863 5.68629 12 9 12H11C14.3137 12 17 14.6863 17 18"
+                stroke="currentColor" stroke-width="2" />
+            </svg>
+            <input type="text" id="fullName" placeholder="Enter your full name"
+              formControlName="name" />
+          </div>
+          <span class="field-error" *ngIf="name?.invalid && name?.touched">
+            Full name is required (min 3 characters)
+          </span>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="2" />
+              <path d="M2 6L10 11L18 6" stroke="currentColor" stroke-width="2" />
+            </svg>
+            <input type="email" id="email" placeholder="Enter your email"
+              formControlName="email" />
+          </div>
+          <span class="field-error" *ngIf="email?.invalid && email?.touched">
+            Please enter a valid email address
+          </span>
+        </div>
+
+        <!-- Phone -->
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M2 3L5 2L7 6L5 7C5 9 7 11 9 11L10 9L14 11L13 14C7 14 2 9 2 3Z"
+                stroke="currentColor" stroke-width="2" />
+            </svg>
+            <input type="tel" id="phone" placeholder="+92 300 1234567"
+              formControlName="phone" />
+          </div>
+          <span class="field-error" *ngIf="phone?.invalid && phone?.touched">
+            Phone number is required
+          </span>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="4" y="8" width="12" height="10" rx="2" stroke="currentColor" stroke-width="2" />
+              <path d="M7 8V6C7 4.34315 8.34315 3 10 3C11.6569 3 13 4.34315 13 6V8"
+                stroke="currentColor" stroke-width="2" />
+            </svg>
+            <input type="password" id="password" placeholder="Create a password"
+              formControlName="password" />
+            <button type="button" class="toggle-password" id="togglePassword">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="2" />
+                <path d="M1 10C1 10 4 4 10 4C16 4 19 10 19 10C19 10 16 16 10 16C4 16 1 10 1 10Z"
+                  stroke="currentColor" stroke-width="2" />
+              </svg>
+            </button>
+          </div>
+          <span class="field-error" *ngIf="password?.invalid && password?.touched">
+            Password must be at least 6 characters
+          </span>
+          <p class="password-hint">Use 8+ characters with mix of letters, numbers & symbols</p>
+        </div>
+
+        <!-- Terms Checkbox -->
+        <label class="checkbox-label terms-checkbox">
+          <input type="checkbox" id="terms" required />
+          <span class="checkmark"></span>
+          <span>I agree to the <a href="#" class="link">Terms & Conditions</a> and
+            <a href="#" class="link">Privacy Policy</a></span>
+        </label>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-submit" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Create Account</span>
+          <span *ngIf="isLoading">Creating Account...</span>
+          <svg *ngIf="!isLoading" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M4 10H16M16 10L12 6M16 10L12 14"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
+
+        <!-- Login Link -->
+        <div class="form-footer">
+          <p>Already have an account? <a routerLink="/visitor/login">Login</a></p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
