@@ -21,7 +21,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./categories.css','../../style.css']
 })
 export class Categories implements OnInit {
-  private readonly API = 'http://localhost:5183/api';
+  private readonly API = 'http://realtors.somee.com/api';
 
   categories: Category[] = [];
   filtered:   Category[] = [];

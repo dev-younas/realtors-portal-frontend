@@ -19,7 +19,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./plans.css']
 })
 export class SellerPlans implements OnInit {
-  private readonly API = 'http://localhost:5183/api';
+  private readonly API = 'http://realtors.somee.com/api';
 
   packages: Package[] = [];
   loading  = false;

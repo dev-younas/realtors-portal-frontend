@@ -13,7 +13,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./paypal.css','../../style.css']
 })
 export class SettingsPaypalComponent implements OnInit {
-  private readonly API = 'http://localhost:5183/api';
+  private readonly API = 'http://realtors.somee.com/api';
 
   saving = false;
   testing = false;

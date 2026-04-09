@@ -22,7 +22,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./listing-list.css']
 })
 export class ListingList implements OnInit {
-  private readonly API = 'http://localhost:5183/api';
+  private readonly API = 'http://realtors.somee.com/api';
 
   listings: Listing[] = [];
   filtered: Listing[] = [];

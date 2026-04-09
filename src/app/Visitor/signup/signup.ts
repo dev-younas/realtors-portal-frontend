@@ -17,7 +17,7 @@ export class Signup {
   errorMessage = '';
   successMessage = '';
 
-  private apiUrl = 'http://localhost:5183/api/Auth/register';
+  private apiUrl = 'http://realtors.somee.com/api/Auth/register';
 
   constructor(
     private fb: FormBuilder,

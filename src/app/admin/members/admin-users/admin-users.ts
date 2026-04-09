@@ -22,7 +22,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./admin-users.css','../../style.css']
 })
 export class AdminUsers implements OnInit {
-  private readonly API = 'http://localhost:5183/api';
+  private readonly API = 'http://realtors.somee.com/api';
 
   admins: AdminUser[] = [];
   filteredAdmins: AdminUser[] = [];

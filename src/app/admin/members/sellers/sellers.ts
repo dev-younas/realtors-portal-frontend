@@ -25,7 +25,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./sellers.css','../../style.css']
 })
 export class Sellers implements OnInit {
-  private readonly API = 'http://localhost:5183/api';
+  private readonly API = 'http://realtors.somee.com/api';
   readonly PAGE_SIZE = 8;
 
   sellers: Seller[] = [];

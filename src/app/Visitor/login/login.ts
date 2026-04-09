@@ -17,7 +17,7 @@ export class Login {
   errorMessage = '';
   successMessage = '';
 
-  private apiUrl = 'http://localhost:5183/api/Auth/login';
+  private apiUrl = 'http://realtors.somee.com/api/Auth/login';
 
   constructor(
     private fb: FormBuilder,

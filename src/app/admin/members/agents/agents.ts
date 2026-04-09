@@ -25,7 +25,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./agents.css','../../style.css' ]
 })
 export class AgentsComponent implements OnInit {
-  private readonly API = 'http://localhost:5183/api';
+  private readonly API = 'http://realtors.somee.com/api';
   readonly PAGE_SIZE = 8;
 
   agents: Agent[] = [];

@@ -24,7 +24,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./transactions.css','../../style.css']
 })
 export class Transactions implements OnInit {
-  private readonly API = 'http://localhost:5183/api';
+  private readonly API = 'http://realtors.somee.com/api';
   readonly PAGE_SIZE = 10;
 
   transactions: Transaction[] = [];

@@ -13,7 +13,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./profile.css']
 })
 export class AgentProfile implements OnInit {
-  private readonly API = 'http://localhost:5183/api';
+  private readonly API = 'http://realtors.somee.com/api';
 
   loading = true;
   saving  = false;

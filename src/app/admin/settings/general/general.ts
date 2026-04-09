@@ -13,7 +13,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./general.css','../../style.css']
 })
 export class SettingsGeneralComponent implements OnInit {
-  private readonly API = 'http://localhost:5183/api';
+  private readonly API = 'http://realtors.somee.com/api';
 
   activeSection = 'portal';
   saving = false;
