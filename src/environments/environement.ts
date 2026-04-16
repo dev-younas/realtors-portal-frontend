@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://realtors.somee.com/api'
+  apiUrl: 'https://realtors.somee.com/api'  // ✅ https karo
 };
