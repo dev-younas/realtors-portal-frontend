@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environement';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  private apiUrl = 'http://realtors.somee.com/api';
+  private apiUrl = environment.apiUrl;  // ✅ environment se le raha hai
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router) { }
 
   login(email: string, password: string) {
     return this.http.post<any>(`${this.apiUrl}/auth/login`, { email, password })
@@ -31,7 +32,6 @@ export class AuthService {
   getRole() { return localStorage.getItem('role'); }
   isLoggedIn() { return !!this.getToken(); }
 
-  // Login ke baad role dekh ke redirect karo
   redirectByRole() {
     const role = this.getRole();
     if (role === 'Admin') this.router.navigate(['/admin/dashboard']);
