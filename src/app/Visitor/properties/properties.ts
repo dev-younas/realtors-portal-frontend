@@ -17,7 +17,7 @@ export class Properties implements OnInit {
   loading = true;
   errorMessage = '';
 
-  private baseUrl = 'http://realtors.somee.com/api/Listing/approved';
+  private baseUrl = 'https://realtors.somee.com/api/Listing/approved';
 
   constructor(
     private http: HttpClient,

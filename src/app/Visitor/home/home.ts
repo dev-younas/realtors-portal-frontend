@@ -15,7 +15,7 @@ export class Home implements OnInit {
   listings: any[] = [];
   loading = true;
 
-  private baseUrl = 'http://realtors.somee.com/api/Listing';
+  private baseUrl = 'https://realtors.somee.com/api/Listing';
 
   constructor(
     private http: HttpClient,
