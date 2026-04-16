@@ -3,6 +3,7 @@ import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms'; 
+import { environment } from '../../../../environments/environement';
 
 interface Listing {
   id: number;
@@ -22,7 +23,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./listing-list.css']
 })
 export class ListingList implements OnInit {
-  private readonly API = 'http://realtors.somee.com/api';
+  private readonly API = environment.apiUrl;
 
   listings: Listing[] = [];
   filtered: Listing[] = [];

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule }      from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../environments/environement';
 
 @Component({
   selector: 'app-agent-my-package',
@@ -11,7 +12,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   styleUrls: ['./packages.css']
 })
 export class AgentMyPackage implements OnInit {
-  private readonly API = 'http://realtors.somee.com/api';
+  private readonly API = environment.apiUrl;
 
   loading      = true;
   subscription: any = null;

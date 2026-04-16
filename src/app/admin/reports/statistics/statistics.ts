@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../../environments/environement';
 
 @Component({
   selector: 'app-statistics',
@@ -11,7 +12,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   styleUrls: ['./statistics.css','../../style.css']
 })
 export class Statistics implements OnInit {
-  private readonly API = 'http://realtors.somee.com/api';
+  private readonly API = environment.apiUrl;
 
   period = '30';
 

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../environments/environement';
 
 interface Toast { message: string; type: 'success' | 'error'; }
 
@@ -13,7 +14,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./profile.css']
 })
 export class SellerProfile implements OnInit {
-  private readonly API = 'http://realtors.somee.com/api';
+  private readonly API = environment.apiUrl;
 
   loading = true;
   saving  = false;

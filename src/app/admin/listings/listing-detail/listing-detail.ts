@@ -2,6 +2,7 @@ import { Component, OnInit }               from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpHeaders }            from '@angular/common/http';
+import { environment } from '../../../../environments/environement';
 
 interface Listing {
   id: number; title: string; category: string; agentName: string;
@@ -19,7 +20,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./listing-detail.css','../../style.css']
 })
 export class ListingDetail implements OnInit {
-  private readonly API = 'http://realtors.somee.com/api';
+  private readonly API = environment.apiUrl;
 
   listing: Listing | null = null;
   loading = true;

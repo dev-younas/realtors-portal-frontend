@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../../environments/environement';
 
 interface Seller {
   id: number;
@@ -25,7 +26,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./sellers.css','../../style.css']
 })
 export class Sellers implements OnInit {
-  private readonly API = 'http://realtors.somee.com/api';
+  private readonly API = environment.apiUrl;
   readonly PAGE_SIZE = 8;
 
   sellers: Seller[] = [];

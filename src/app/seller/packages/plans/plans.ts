@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { environment } from '../../../../environments/environement';
 
 interface Package {
   id: number; name: string; description: string;
@@ -19,7 +20,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./plans.css']
 })
 export class SellerPlans implements OnInit {
-  private readonly API = 'http://realtors.somee.com/api';
+  private readonly API = environment.apiUrl;
 
   packages: Package[] = [];
   loading  = false;

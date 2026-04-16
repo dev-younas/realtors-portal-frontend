@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe, DatePipe, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../../environments/environement';
 
 interface Transaction {
   id: string;
@@ -24,7 +25,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./transactions.css','../../style.css']
 })
 export class Transactions implements OnInit {
-  private readonly API = 'http://realtors.somee.com/api';
+  private readonly API = environment.apiUrl;
   readonly PAGE_SIZE = 10;
 
   transactions: Transaction[] = [];

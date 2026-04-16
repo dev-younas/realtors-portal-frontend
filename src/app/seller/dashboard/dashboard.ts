@@ -3,6 +3,7 @@ import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms'; 
+import { environment } from '../../../environments/environement';
 
 @Component({
   selector: 'app-seller-dashboard',
@@ -12,7 +13,7 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./dashboard.css']
 })
 export class SellerDashboard implements OnInit {
-  private readonly API = 'http://realtors.somee.com/api';
+  private readonly API = environment.apiUrl;
 
   loading = true;
   today   = new Date();

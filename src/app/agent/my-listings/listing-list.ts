@@ -3,6 +3,7 @@ import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { FormsModule }       from '@angular/forms';
 import { RouterModule }      from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../environments/environement';
 
 interface Toast { message: string; type: 'success' | 'error'; }
 
@@ -14,7 +15,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./listing-list.css']
 })
 export class AgentListingList implements OnInit {
-  private readonly API = 'http://realtors.somee.com/api';
+  private readonly API = environment.apiUrl;
 
   listings: any[] = [];
   filtered: any[] = [];

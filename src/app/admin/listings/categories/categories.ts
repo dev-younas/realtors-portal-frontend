@@ -2,6 +2,7 @@ import { Component, OnInit }      from '@angular/core';
 import { CommonModule, DatePipe }  from '@angular/common';
 import { FormsModule }             from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../../environments/environement';
 
 interface Category {
   id: number;
@@ -21,7 +22,7 @@ interface Toast { message: string; type: 'success' | 'error'; }
   styleUrls: ['./categories.css','../../style.css']
 })
 export class Categories implements OnInit {
-  private readonly API = 'http://realtors.somee.com/api';
+  private readonly API = environment.apiUrl;
 
   categories: Category[] = [];
   filtered:   Category[] = [];
